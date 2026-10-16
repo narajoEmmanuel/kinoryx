@@ -42,3 +42,9 @@ The dashboard imports the engine. The engine must never import the dashboard or 
 MIT licensed code. The KINORYX name and third-party data are not licensed by MIT. Commercial use of MIT licensed code is permitted subject to the license. No trademark clearance has been performed. **Never commit real patient files, identifiers or private sensor recordings.** A local CSV processing workflow does not itself establish medical-device validation.
 
 See [architecture](docs/ARCHITECTURE.md), [data contract](docs/DATA_CONTRACT.md), [validation](docs/SCIENTIFIC_VALIDATION.md), [security](docs/SECURITY_AND_PRIVACY.md) and [contributing](CONTRIBUTING.md).
+
+## Biomechanics Dashboard workspace (experimental)
+
+A focused local signal-exploration workspace is being developed independently under `apps/biomechanics_dashboard/`.
+It provides channel visibility controls, bilateral views, transparent recording context and unvalidated candidate-peak inspection.
+See [Dashboard Workspace](docs/DASHBOARD_WORKSPACE.md) for its status and scientific limitations.

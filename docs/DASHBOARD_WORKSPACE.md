@@ -1,0 +1,103 @@
+# Biomechanics Dashboard | Workspace v0.3 academic baseline
+
+**Status:** exploratory user interface proposal, separate from the Gait Detection Engine.
+
+## Product responsibility
+
+The Dashboard enables researchers to inspect, interact with, and contextualize biomechanics signals. It consumes output from the engine but does not implement filtering or gait-event detection algorithms. KINORYX remains local-first, vendor-neutral, free to run, and without a hosted patient-data service.
+
+## Academic visual direction
+
+The dashboard now adopts an **article-first visual system** designed for researchers who want to export figures and place them into manuscripts, theses, or conference material with minimal redesign.
+
+### Grounding principles
+
+- Figure text and chart labels should follow the conservative font choices repeatedly accepted by major publishers: **Arial/Helvetica class sans-serif** for figure text and axis labels.
+- Layout should prioritize readability: visible axis lines, tick marks, units, restrained decoration, and no dependence on red-versus-green color contrast.
+- Supporting explanatory text should behave like a **figure legend**: a short title followed by a concise description of what is shown and what the symbols mean.
+- Export should support downstream manuscript assembly, so the Plotly download action is configured for **SVG output** by default.
+- The overall KINORYX identity for the dashboard should feel scholarly rather than consumer-tech: quiet surfaces, a neutral Chat Gray palette, high contrast, and typography that does not fight with the data.
+
+## Visual system decisions implemented
+
+### 1. Typography
+
+- **Titles and section headers:** a single heavier display face based on locally available Arial Black / Arial bold fallbacks.
+- **Charts, axes, legends and tables:** Arial / Helvetica style sans-serif.
+- **Narrative and explanatory copy:** Georgia / Times New Roman style serif to evoke the cadence of article legends and manuscript body text.
+
+### 2. Color strategy
+
+- Primary identity background: **Chat Gray #F5F5F4** (approved Option 01), flat and neutral without gradients or bone texture; white #FFFFFF panels, discreet cool-gray borders and charcoal text.
+- Left and right signals use a **high-contrast, publication-safe pair** rather than red-green.
+- Signal differentiation also relies on **line style and marker shape**, not color alone.
+
+### 3. Figure behavior
+
+- Exported figure background is plain white (#FFFFFF), with no interface tint, gradients, shadows or brand panels. The surrounding interface uses Chat Gray #F5F5F4. This protects readability and compatibility with journal manuscript layout.
+- Gridlines are suppressed by default.
+- Axes remain explicit with tick marks and units.
+- The chart export tool defaults to **SVG**, appropriate for vector-based article assembly.
+- Candidate peak markers are clearly labeled as **exploratory** and **unvalidated**.
+
+## User experience
+
+1. Open the application locally. The default, clearly labeled example uses **synthetic** foot-gyro-like data.
+2. Optionally load a canonical CSV. The application validates it using the existing engine ingestion contract.
+3. Review recording duration, estimated sampling rate, available channels and number of **unvalidated peak candidates**.
+4. Inspect raw and filtered signals with independent visibility controls, selecting both feet or one side.
+5. Copy or export a figure with manuscript-appropriate typographic treatment.
+6. Read the legend-style contextual note and inspect the candidate table.
+
+## Screen architecture
+
+- Persistent identity block and academic framing at the top.
+- Input section with local CSV dropzone.
+- A single metric strip, using fine separators instead of cards.
+- A primary rectangular white plotting sheet for signals and manuscript-oriented export.
+- An open research-notes column, separated by a fine rule, with figure notes, candidate table and methodological notes.
+
+## Scientific boundaries
+
+- The Dashboard **does not validate** gait events.
+- Peak candidates are **not** initial contact, toe-off, stance, swing, or subphases.
+- The article-ready visual styling must never be mistaken for validated clinical output.
+
+## Next dashboard milestones
+
+1. Add a formal figure export preset system (single-column and double-column dimensions).
+2. Add optional panel lettering for multi-panel manuscript figures.
+3. Add downloadable caption text and source-data export for the current view.
+4. Add cycle-normalized views and paired summary panels once the engine is scientifically ready.
+5. Add user-configurable but guarded styling presets for specific journal families.
+
+## Source publication specifications reviewed
+
+- Nature Research figure guide: https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/
+- Nature figures: https://www.nature.com/nature/for-authors/final-submission
+- PLOS Biology figure requirements: https://journals.plos.org/plosbiology/s/figures
+- Elsevier artwork overview: https://www.elsevier.com/about/policies-and-standards/author/artwork-and-media-instructions/artwork-overview
+
+Guidance differs by journal. KINORYX does not claim universal publisher approval or clinical validation. Figure legends are displayed in the interface but are not embedded in exported SVG figures by default; include them in manuscript captions.
+## Visual decision, 15 October 2026
+
+The previously explored warm bone / parchment palette was **rejected**. The user approved **Option 01, Gris Chat (#F5F5F4)**, with white figure backgrounds, open section layout, gray dividers and neutral charcoal typography. Do not restore gold/bone textures without explicit approval. Academic figure-export standards remain unchanged, including pure-white plot backgrounds and SVG output.
+
+## Layout refinement: unboxed research workspace (15 October 2026)
+
+The user rejected the rounded, floating-card (“bubble”) interface. The approved Chat Gray #F5F5F4 and scientific plot styling remain. Dashboard sections are now defined by whitespace and restrained rules, with no elevated containers, large radii, metric tiles, pill-like controls or boxed research notes. The signal figure itself retains a plain-white rectangular sheet with a thin frame. Engine, chart data and CSV logic remain unchanged. This is a visual iteration under draft PR #1; review in-browser before merging to main.
+
+## Visual refinement: editorial breathing room and academic blue (15 October 2026)
+
+The user requested fewer text-heavy sections, more whitespace and restrained blue emphasis. The approved #F5F5F4 background, flat separators and pure white exportable figure remain unchanged. Titles use **#235D86** in the dashboard only; scientific plot labels and traces preserve publication-first neutral styling. The hero is reduced to one concise description, the import/control copy is trimmed, the metrics strip shows labels and values without explanatory clutter, the SVG export tip is consolidated above the plot, the figure legend is shortened without losing scientific caveats, and data-quality notes appear only when warnings exist. This is an unmerged visual iteration of PR #1.
+
+## Multipanel signal inspection (15 October 2026)
+
+The user requested a stronger blue and QTM/Qualisys-style multiple time-series panels, not a single overlay graph. **Dashboard heading blue:** #0847A6 on approved neutral #F5F5F4. The default Signal explorer has **four linked time-axis panels**: left raw, right raw, left filtered, right filtered. Candidate peaks appear only in the corresponding filtered panel and remain unvalidated. Users can switch between a two-column grid and vertically stacked views; hide sides/layers to reduce the number of panels. A single SVG exports all currently displayed panes with a plain white manuscript-safe background. The wide graph occupies its own full-width row; method notes and candidate table sit underneath. No new sensor modalities, gait-event validation, Qualisys data import, or motion-capture functionality are implied. No engine files changed.
+
+### Reference basis
+
+Qualisys QTM documentation permits multiple plots of trajectories and other channels with independently arranged/docked windows. KINORYX adapts the **multi-window time-series comparison concept** within its own neutral academic interface, without claiming the same feature set or copying proprietary design.
+
+- https://docs.qualisys.com/getting-started/content/51_how_to_plot_data_in_qtm/plotting_data.htm
+- https://docs.qualisys.com/qtm/content/qtm_user_interface/qtm_windows/window_layout.htm
