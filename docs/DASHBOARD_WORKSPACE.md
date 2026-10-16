@@ -53,9 +53,9 @@ The dashboard now adopts an **article-first visual system** designed for researc
 
 - Persistent identity block and academic framing at the top.
 - Input section with local CSV dropzone.
-- Metrics cards describing recording context.
-- Main figure card for signals and article-ready export.
-- Side panel with figure-note narrative, candidate peak table, and methodological notes.
+- A single metric strip, using fine separators instead of cards.
+- A primary rectangular white plotting sheet for signals and manuscript-oriented export.
+- An open research-notes column, separated by a fine rule, with figure notes, candidate table and methodological notes.
 
 ## Scientific boundaries
 
@@ -81,4 +81,8 @@ The dashboard now adopts an **article-first visual system** designed for researc
 Guidance differs by journal. KINORYX does not claim universal publisher approval or clinical validation. Figure legends are displayed in the interface but are not embedded in exported SVG figures by default; include them in manuscript captions.
 ## Visual decision, 15 October 2026
 
-The previously explored warm bone / parchment palette was **rejected**. The user approved **Option 01, Gris Chat (#F5F5F4)**, with white cards, gray dividers and neutral charcoal typography. Do not restore gold/bone textures without explicit approval. Academic figure-export standards remain unchanged, including pure-white plot backgrounds and SVG output.
+The previously explored warm bone / parchment palette was **rejected**. The user approved **Option 01, Gris Chat (#F5F5F4)**, with white figure backgrounds, open section layout, gray dividers and neutral charcoal typography. Do not restore gold/bone textures without explicit approval. Academic figure-export standards remain unchanged, including pure-white plot backgrounds and SVG output.
+
+## Layout refinement: unboxed research workspace (15 October 2026)
+
+The user rejected the rounded, floating-card (“bubble”) interface. The approved Chat Gray #F5F5F4 and scientific plot styling remain. Dashboard sections are now defined by whitespace and restrained rules, with no elevated containers, large radii, metric tiles, pill-like controls or boxed research notes. The signal figure itself retains a plain-white rectangular sheet with a thin frame. Engine, chart data and CSV logic remain unchanged. This is a visual iteration under draft PR #1; review in-browser before merging to main.
