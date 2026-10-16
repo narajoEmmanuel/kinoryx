@@ -229,9 +229,9 @@ def build_caption(
     visible_layers: tuple[str, ...],
 ) -> html.Div:
     panel_descriptor = {
-        "bilateral": "bilateral left-right comparison",
-        "left": "left-foot focused view",
-        "right": "right-foot focused view",
+        "bilateral": "left and right channels",
+        "left": "left channel",
+        "right": "right channel",
     }[view_mode]
     layer_phrase = ", ".join(layer.replace("candidates", "candidate peaks") for layer in visible_layers)
     warning_copy = (
@@ -244,11 +244,10 @@ def build_caption(
             html.Div("Figure note", className="caption-title"),
             html.P(
                 [
-                    html.Strong("Exploratory angular-velocity traces from KINORYX. "),
-                    f"This {panel_descriptor} presents {layer_phrase} for {source_label.lower()} data. ",
-                    "Signals were processed by the current exploratory pipeline and are shown for research inspection only. ",
-                    f"The analysis detected {len(result.peaks)} unvalidated peak candidates; the table shows up to 12. ",
-                    "These candidates are not equivalent to heel strikes, toe-offs, stance phases, or validated gait events.",
+                    html.Strong("Exploratory angular velocity. "),
+                    f"{source_label}: {panel_descriptor}; layers: {layer_phrase or 'none'}. ",
+                    f"{len(result.peaks)} unvalidated peak candidates (up to 12 shown). ",
+                    "Candidates do not represent confirmed initial contacts, toe-offs or gait phases.",
                     warning_copy,
                 ],
                 className="caption-copy",
@@ -267,12 +266,8 @@ def create_app() -> Dash:
                     html.Div("KINORYX", className="brand-kicker"),
                     html.H1("Biomechanics Dashboard", className="page-title"),
                     html.P(
-                        "Local-first workspace for article-ready signal inspection, figure export, and transparent exploratory reporting.",
+                        "Explore movement signals. Export figures for research.",
                         className="page-subtitle",
-                    ),
-                    html.P(
-                        "The visual system follows common figure conventions used by major scientific publishers: restrained typography, legible axes, accessible contrast, and concise legend-style narrative.",
-                        className="page-intro",
                     ),
                 ],
                 className="hero-panel",
@@ -281,18 +276,14 @@ def create_app() -> Dash:
                 [
                     html.Div(
                         [
-                            html.H2("Input", className="section-title"),
-                            html.P(
-                                "Load a canonical CSV or leave the default synthetic demonstration dataset in place.",
-                                className="section-copy",
-                            ),
+                            html.H2("Dataset", className="section-title"),
                             dcc.Upload(
                                 id="csv-upload",
                                 children=html.Div(
                                     [
-                                        html.Span("Drop a CSV here or click to select.", className="upload-title"),
+                                        html.Span("Import CSV", className="upload-title"),
                                         html.Span(
-                                            " Accepted input is local, never uploaded to a remote service.",
+                                            "Or explore the synthetic example · Local processing",
                                             className="upload-note",
                                         ),
                                     ]
@@ -306,16 +297,16 @@ def create_app() -> Dash:
                     ),
                     html.Div(
                         [
-                            html.H2("Display controls", className="section-title"),
+                            html.H2("View", className="section-title"),
                             html.Div(
                                 [
-                                    html.Div("Comparison layout", className="control-label"),
+                                    html.Div("Side", className="control-label"),
                                     dcc.RadioItems(
                                         id="view-mode",
                                         options=[
                                             {"label": "Bilateral", "value": "bilateral"},
-                                            {"label": "Left only", "value": "left"},
-                                            {"label": "Right only", "value": "right"},
+                                            {"label": "Left", "value": "left"},
+                                            {"label": "Right", "value": "right"},
                                         ],
                                         value="bilateral",
                                         className="radio-grid",
@@ -327,7 +318,7 @@ def create_app() -> Dash:
                             ),
                             html.Div(
                                 [
-                                    html.Div("Visible figure layers", className="control-label"),
+                                    html.Div("Layers", className="control-label"),
                                     dcc.Checklist(
                                         id="layer-selection",
                                         options=[
@@ -343,10 +334,6 @@ def create_app() -> Dash:
                                 ],
                                 className="control-block",
                             ),
-                            html.Div(
-                                "Use the Plotly export control to download an SVG figure for manuscript assembly.",
-                                className="export-note",
-                            ),
                         ],
                         className="workspace-card controls-card",
                     ),
@@ -358,9 +345,9 @@ def create_app() -> Dash:
                 [
                     html.Div(
                         [
-                            html.H2("Signal figure", className="section-title"),
+                            html.H2("Signal explorer", className="section-title"),
                             html.P(
-                                "Axes, units, line styles, and text are intentionally restrained to support direct reuse in scientific figures.",
+                                "Zoom to inspect · Export SVG using the chart toolbar",
                                 className="section-copy compact-copy",
                             ),
                             html.Div(id="status-banner", className="status-banner", role="status"),
@@ -372,9 +359,9 @@ def create_app() -> Dash:
                     ),
                     html.Div(
                         [
-                            html.H2("Legend-style context", className="section-title"),
+                            html.H2("Figure legend", className="section-title"),
                             html.Div(id="figure-caption"),
-                            html.H2("Candidate peak table", className="section-title table-heading"),
+                            html.H2("Peak candidates", className="section-title table-heading"),
                             html.Div(id="peak-table-container"),
                             html.Div(id="warning-box", className="warning-box"),
                         ],
@@ -386,7 +373,7 @@ def create_app() -> Dash:
             html.Footer(
                 [
                     html.P(
-                        "Pre-alpha research software. Unvalidated peak candidates are shown for exploratory inspection only; they are not clinical endpoints, gait phases, or diagnostic outputs.",
+                        "Research prototype · Exploratory peaks are not validated gait events or clinical measurements.",
                         className="footer-copy",
                     )
                 ],
@@ -416,23 +403,18 @@ def create_app() -> Dash:
             figure = build_figure(result, view_mode=view_mode, visible_layers=selected_layers)
             duration_s = result.raw["time_s"].iloc[-1] - result.raw["time_s"].iloc[0]
             metrics = [
-                metric_card("Data source", source_label, "Deterministic example" if contents is None else "Researcher-supplied file"),
-                metric_card("Duration", f"{duration_s:.2f} s", "Time span represented"),
-                metric_card("Sampling rate", f"{result.info.sampling_hz:.1f} Hz", "Estimated from time_s"),
-                metric_card("Channels", str(len(result.info.available_channels)), ", ".join(result.info.available_channels)),
-                metric_card("Candidate peaks", str(len(result.peaks)), "Exploratory, not validated events"),
+                metric_card("Dataset", source_label),
+                metric_card("Duration", f"{duration_s:.2f} s"),
+                metric_card("Estimated frequency", f"{result.info.sampling_hz:.1f} Hz"),
+                metric_card("Channels", str(len(result.info.available_channels))),
+                metric_card("Unvalidated peaks", str(len(result.peaks))),
             ]
-            status = (
-                f"{source_label} loaded. Use the export control to save the current figure as SVG for manuscript composition."
-            )
+            status = f"{source_label} · {result.info.rows:,} samples"
             caption = build_caption(result, source_label, view_mode, selected_layers)
-            warnings = result.info.warnings or [
-                "No sampling or contract warnings detected for the current file."
-            ]
             warning_children = [
-                html.Div("Methodological notes", className="warning-title"),
-                html.Ul([html.Li(note) for note in warnings], className="warning-list"),
-            ]
+                html.Div("Data quality", className="warning-title"),
+                html.Ul([html.Li(note) for note in result.info.warnings], className="warning-list"),
+            ] if result.info.warnings else []
             return figure, status, metrics, build_peak_table(result), caption, warning_children
         except (ValueError, pd.errors.ParserError, pd.errors.EmptyDataError) as exc:
             empty = go.Figure()

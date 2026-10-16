@@ -86,3 +86,7 @@ The previously explored warm bone / parchment palette was **rejected**. The user
 ## Layout refinement: unboxed research workspace (15 October 2026)
 
 The user rejected the rounded, floating-card (“bubble”) interface. The approved Chat Gray #F5F5F4 and scientific plot styling remain. Dashboard sections are now defined by whitespace and restrained rules, with no elevated containers, large radii, metric tiles, pill-like controls or boxed research notes. The signal figure itself retains a plain-white rectangular sheet with a thin frame. Engine, chart data and CSV logic remain unchanged. This is a visual iteration under draft PR #1; review in-browser before merging to main.
+
+## Visual refinement: editorial breathing room and academic blue (15 October 2026)
+
+The user requested fewer text-heavy sections, more whitespace and restrained blue emphasis. The approved #F5F5F4 background, flat separators and pure white exportable figure remain unchanged. Titles use **#235D86** in the dashboard only; scientific plot labels and traces preserve publication-first neutral styling. The hero is reduced to one concise description, the import/control copy is trimmed, the metrics strip shows labels and values without explanatory clutter, the SVG export tip is consolidated above the plot, the figure legend is shortened without losing scientific caveats, and data-quality notes appear only when warnings exist. This is an unmerged visual iteration of PR #1.

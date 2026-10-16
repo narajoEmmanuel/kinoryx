@@ -452,3 +452,93 @@ html, body {
   .metric-value { font-size: 1.17rem; }
   .scientific-table th, .scientific-table td { padding: 9px 5px; }
 }
+
+/* v0.5 — academic hierarchy: fewer words, more whitespace, restrained blue titles. */
+:root { --heading-blue: #235D86; }
+.page-title, .section-title {
+  color: var(--heading-blue);
+}
+.brand-kicker {
+  color: var(--heading-blue);
+  margin-bottom: 16px;
+}
+.hero-panel {
+  padding-top: 14px;
+  padding-bottom: 33px;
+  margin-bottom: 37px;
+}
+.page-title {
+  font-size: clamp(2.1rem, 3.8vw, 3.35rem);
+  letter-spacing: -0.03em;
+}
+.page-subtitle {
+  margin-top: 16px;
+  max-width: 650px;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+.two-column-grid {
+  gap: clamp(32px, 4.5vw, 76px);
+  padding-bottom: 35px;
+  margin-bottom: 27px;
+}
+.controls-card {
+  padding-left: clamp(28px, 4vw, 52px);
+}
+.section-title {
+  font-size: 1.12rem;
+  margin-bottom: 18px;
+}
+.control-block + .control-block { margin-top: 22px; }
+.upload-box {
+  min-height: 105px;
+  padding: 25px 30px;
+}
+.upload-title { font-size: 1rem; }
+.upload-note { font-size: 0.86rem; }
+.metrics-grid {
+  padding-bottom: 35px;
+  margin-bottom: 47px;
+}
+.metric-card { min-height: 73px; }
+.metric-label {
+  font-size: 0.72rem;
+  margin-bottom: 12px;
+}
+.metric-value { font-size: clamp(1.15rem, 1.8vw, 1.55rem); }
+.main-grid {
+  gap: clamp(38px, 5vw, 82px);
+}
+.side-card {
+  padding-left: clamp(28px, 4vw, 52px);
+}
+.figure-card > .section-copy {
+  margin-top: -7px;
+  margin-bottom: 24px;
+  font-family: var(--figure-font);
+  font-size: 0.86rem;
+}
+.status-banner { margin-bottom: 17px; }
+.caption-block { padding-bottom: 27px; margin-bottom: 29px; }
+.caption-copy { line-height: 1.8; }
+.table-heading { margin-bottom: 19px; }
+.warning-box:empty { display: none; }
+.page-footer { margin-top: 55px; }
+@media (max-width: 1100px) {
+  .two-column-grid { gap: 34px; }
+  .controls-card, .side-card { padding-left: 28px; }
+  .main-grid { gap: 30px; }
+}
+@media (max-width: 820px) {
+  .two-column-grid { gap: 26px; }
+  .controls-card, .side-card { padding-left: 0; }
+  .metrics-grid { margin-bottom: 34px; }
+  .main-grid { gap: 35px; }
+}
+@media (max-width: 480px) {
+  .hero-panel { padding-top: 4px; padding-bottom: 27px; margin-bottom: 27px; }
+  .page-title { font-size: 2.05rem; }
+  .section-title { font-size: 1.06rem; }
+  .two-column-grid { padding-bottom: 27px; }
+}
