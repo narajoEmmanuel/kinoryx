@@ -90,3 +90,14 @@ The user rejected the rounded, floating-card (“bubble”) interface. The appro
 ## Visual refinement: editorial breathing room and academic blue (15 October 2026)
 
 The user requested fewer text-heavy sections, more whitespace and restrained blue emphasis. The approved #F5F5F4 background, flat separators and pure white exportable figure remain unchanged. Titles use **#235D86** in the dashboard only; scientific plot labels and traces preserve publication-first neutral styling. The hero is reduced to one concise description, the import/control copy is trimmed, the metrics strip shows labels and values without explanatory clutter, the SVG export tip is consolidated above the plot, the figure legend is shortened without losing scientific caveats, and data-quality notes appear only when warnings exist. This is an unmerged visual iteration of PR #1.
+
+## Multipanel signal inspection (15 October 2026)
+
+The user requested a stronger blue and QTM/Qualisys-style multiple time-series panels, not a single overlay graph. **Dashboard heading blue:** #0847A6 on approved neutral #F5F5F4. The default Signal explorer has **four linked time-axis panels**: left raw, right raw, left filtered, right filtered. Candidate peaks appear only in the corresponding filtered panel and remain unvalidated. Users can switch between a two-column grid and vertically stacked views; hide sides/layers to reduce the number of panels. A single SVG exports all currently displayed panes with a plain white manuscript-safe background. The wide graph occupies its own full-width row; method notes and candidate table sit underneath. No new sensor modalities, gait-event validation, Qualisys data import, or motion-capture functionality are implied. No engine files changed.
+
+### Reference basis
+
+Qualisys QTM documentation permits multiple plots of trajectories and other channels with independently arranged/docked windows. KINORYX adapts the **multi-window time-series comparison concept** within its own neutral academic interface, without claiming the same feature set or copying proprietary design.
+
+- https://docs.qualisys.com/getting-started/content/51_how_to_plot_data_in_qtm/plotting_data.htm
+- https://docs.qualisys.com/qtm/content/qtm_user_interface/qtm_windows/window_layout.htm

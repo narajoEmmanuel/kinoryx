@@ -8,10 +8,12 @@ Run from the repository root:
 import base64
 import binascii
 import io
+import math
 from typing import Iterable
 
 import pandas as pd
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from dash import Dash, Input, Output, dcc, html
 
 from kinoryx.demo.synthetic import generate_demo_dataset
@@ -41,8 +43,8 @@ GRAPH_CONFIG = {
     "toImageButtonOptions": {
         "format": "svg",
         "filename": "kinoryx_figure",
-        "height": 720,
-        "width": 1200,
+        "height": 900,
+        "width": 1500,
         "scale": 1,
     },
 }
@@ -76,113 +78,112 @@ def build_figure(
     *,
     view_mode: str = "bilateral",
     visible_layers: tuple[str, ...] = ("raw", "filtered", "candidates"),
+    panel_layout: str = "grid",
 ) -> go.Figure:
-    figure = go.Figure()
-    time = result.raw["time_s"]
+    """Separate raw and filtered angular velocity by side, with linked time axes."""
+    if panel_layout not in ("grid", "stack"):
+        raise ValueError("Unknown panel layout")
+    layers = set(visible_layers)
     sides = _visible_sides(view_mode, result.info.available_channels)
-    for side in sides:
-        channel = f"{side}_gyro_y_deg_s"
-        if channel not in result.info.available_channels:
+    panels = []
+    for stage in ("raw", "filtered"):
+        if stage == "raw" and "raw" not in layers:
             continue
+        if stage == "filtered" and not {"filtered", "candidates"}.intersection(layers):
+            continue
+        for side in sides:
+            channel = f"{side}_gyro_y_deg_s"
+            if channel in result.info.available_channels:
+                panels.append((side, stage, channel))
+
+    cols = 2 if panel_layout == "grid" and len(panels) > 1 else 1
+    rows = max(1, math.ceil(len(panels) / cols))
+    figure = make_subplots(
+        rows=rows,
+        cols=cols,
+        shared_xaxes="all",
+        subplot_titles=[f"{SIDE_META[s]['label']} · {stage.title()}" for s, stage, _ in panels],
+        vertical_spacing=0.14 if rows > 1 else 0.0,
+        horizontal_spacing=0.11 if cols > 1 else 0.0,
+    )
+    time = result.raw["time_s"]
+    for i, (side, stage, channel) in enumerate(panels):
+        row, col = divmod(i, cols)
+        row += 1
+        col += 1
         meta = SIDE_META[side]
-        if "raw" in visible_layers:
+        if stage == "raw":
             figure.add_trace(
                 go.Scatter(
-                    x=time,
-                    y=result.raw[channel],
-                    mode="lines",
+                    x=time, y=result.raw[channel], mode="lines",
                     name=f"{meta['label']} raw",
-                    opacity=RAW_ALPHA,
-                    line={"color": meta["color"], "dash": "dot", "width": 1.1},
-                )
+                    line={"color": meta["color"], "width": 1.4},
+                    showlegend=False,
+                    hovertemplate="Time %{x:.3f} s<br>Raw %{y:.2f} deg/s<extra></extra>",
+                ),
+                row=row, col=col,
             )
-        if "filtered" in visible_layers:
-            figure.add_trace(
-                go.Scatter(
-                    x=time,
-                    y=result.filtered[channel],
-                    mode="lines",
-                    name=f"{meta['label']} filtered",
-                    line={"color": meta["color"], "dash": meta["dash"], "width": 2.2},
+        else:
+            if "filtered" in layers:
+                figure.add_trace(
+                    go.Scatter(
+                        x=time, y=result.filtered[channel], mode="lines",
+                        name=f"{meta['label']} filtered",
+                        line={"color": meta["color"], "width": 2},
+                        showlegend=False,
+                        hovertemplate="Time %{x:.3f} s<br>Filtered %{y:.2f} deg/s<extra></extra>",
+                    ),
+                    row=row, col=col,
                 )
-            )
-        if "candidates" in visible_layers:
-            peaks = [peak for peak in result.peaks if peak.side == side]
-            figure.add_trace(
-                go.Scatter(
-                    x=[peak.time_s for peak in peaks],
-                    y=[peak.amplitude_deg_s for peak in peaks],
-                    mode="markers",
-                    name=f"{meta['label']} candidate peaks",
-                    marker={
-                        "color": meta["color"],
-                        "size": 8,
-                        "symbol": meta["marker"],
-                        "line": {"color": meta["color"], "width": 1.2},
-                    },
+            if "candidates" in layers:
+                peaks = [p for p in result.peaks if p.side == side]
+                figure.add_trace(
+                    go.Scatter(
+                        x=[p.time_s for p in peaks],
+                        y=[p.amplitude_deg_s for p in peaks],
+                        mode="markers",
+                        name=f"{meta['label']} candidate peaks",
+                        marker={
+                            "color": meta["color"], "size": 7,
+                            "symbol": meta["marker"],
+                            "line": {"color": meta["color"], "width": 1},
+                        },
+                        showlegend=False,
+                        hovertemplate="Time %{x:.3f} s<br>%{y:.2f} deg/s<extra>Unvalidated candidate</extra>",
+                    ),
+                    row=row, col=col,
                 )
-            )
     figure.update_layout(
         template=None,
         paper_bgcolor=FIGURE_BACKGROUND,
         plot_bgcolor=FIGURE_BACKGROUND,
-        height=650,
-        margin={"l": 72, "r": 26, "t": 74, "b": 72},
-        hovermode="x unified",
-        font={"family": FIGURE_FONT, "size": 13, "color": TEXT_DARK},
-        legend={
-            "orientation": "h",
-            "x": 0.0,
-            "y": 1.02,
-            "xanchor": "left",
-            "yanchor": "bottom",
-            "bgcolor": "rgba(255,255,255,0)",
-            "borderwidth": 0,
-            "traceorder": "normal",
-            "font": {"family": FIGURE_FONT, "size": 12, "color": TEXT_DARK},
-        },
+        height=405 if len(panels) < 3 else (750 if panel_layout == "grid" else 1040),
+        margin={"l": 78, "r": 25, "t": 68, "b": 64},
+        hovermode="closest",
+        showlegend=False,
+        font={"family": FIGURE_FONT, "size": 12, "color": TEXT_DARK},
     )
+    figure.update_annotations(font={"family": FIGURE_FONT, "size": 14, "color": TEXT_DARK})
     figure.update_xaxes(
-        title_text="Time (s)",
-        showline=True,
-        mirror=True,
-        linewidth=1.3,
-        linecolor=TEXT_DARK,
-        ticks="outside",
-        tickwidth=1.0,
-        ticklen=5,
-        tickcolor=TEXT_DARK,
-        showgrid=False,
-        zeroline=False,
-        title_font={"family": FIGURE_FONT, "size": 14, "color": TEXT_DARK},
-        tickfont={"family": FIGURE_FONT, "size": 12, "color": TEXT_DARK},
+        showline=True, linewidth=1, linecolor=TEXT_DARK, ticks="outside",
+        tickwidth=1, ticklen=4, tickcolor=TEXT_DARK,
+        showgrid=False, zeroline=False,
+        tickfont={"family": FIGURE_FONT, "size": 11, "color": TEXT_DARK},
     )
     figure.update_yaxes(
         title_text="Angular velocity (deg/s)",
-        showline=True,
-        mirror=True,
-        linewidth=1.3,
-        linecolor=TEXT_DARK,
-        ticks="outside",
-        tickwidth=1.0,
-        ticklen=5,
-        tickcolor=TEXT_DARK,
-        showgrid=False,
-        zeroline=True,
-        zerolinewidth=1.0,
-        zerolinecolor="#BDC2C3",
-        title_font={"family": FIGURE_FONT, "size": 14, "color": TEXT_DARK},
-        tickfont={"family": FIGURE_FONT, "size": 12, "color": TEXT_DARK},
+        showline=True, linewidth=1, linecolor=TEXT_DARK, ticks="outside",
+        tickwidth=1, ticklen=4, tickcolor=TEXT_DARK,
+        showgrid=False, zeroline=True, zerolinecolor="#BDC2C3",
+        title_font={"family": FIGURE_FONT, "size": 11, "color": TEXT_DARK},
+        tickfont={"family": FIGURE_FONT, "size": 11, "color": TEXT_DARK},
     )
-    if not figure.data:
+    for col in range(1, cols + 1):
+        figure.update_xaxes(title_text="Time (s)", row=rows, col=col)
+    if not panels:
         figure.add_annotation(
-            text="No visible traces for the current layer and side selection.",
-            x=0.5,
-            y=0.5,
-            xref="paper",
-            yref="paper",
-            showarrow=False,
-            font={"family": FIGURE_FONT, "size": 14, "color": TEXT_SOFT},
+            text="Select a signal layer.", x=0.5, y=0.5, xref="paper", yref="paper",
+            showarrow=False, font={"family": FIGURE_FONT, "size": 14, "color": TEXT_SOFT},
         )
     return figure
 
@@ -318,6 +319,23 @@ def create_app() -> Dash:
                             ),
                             html.Div(
                                 [
+                                    html.Div("Panels", className="control-label"),
+                                    dcc.RadioItems(
+                                        id="panel-layout",
+                                        options=[
+                                            {"label": "2 columns", "value": "grid"},
+                                            {"label": "Stacked", "value": "stack"},
+                                        ],
+                                        value="grid",
+                                        className="radio-grid",
+                                        inputClassName="radio-input",
+                                        labelClassName="radio-label",
+                                    ),
+                                ],
+                                className="control-block",
+                            ),
+                            html.Div(
+                                [
                                     html.Div("Layers", className="control-label"),
                                     dcc.Checklist(
                                         id="layer-selection",
@@ -347,7 +365,7 @@ def create_app() -> Dash:
                         [
                             html.H2("Signal explorer", className="section-title"),
                             html.P(
-                                "Zoom to inspect · Export SVG using the chart toolbar",
+                                "Linked timelines · Zoom any panel · Export SVG",
                                 className="section-copy compact-copy",
                             ),
                             html.Div(id="status-banner", className="status-banner", role="status"),
@@ -359,11 +377,21 @@ def create_app() -> Dash:
                     ),
                     html.Div(
                         [
-                            html.H2("Figure legend", className="section-title"),
-                            html.Div(id="figure-caption"),
-                            html.H2("Peak candidates", className="section-title table-heading"),
-                            html.Div(id="peak-table-container"),
-                            html.Div(id="warning-box", className="warning-box"),
+                            html.Div(
+                                [
+                                    html.H2("Figure legend", className="section-title"),
+                                    html.Div(id="figure-caption"),
+                                    html.Div(id="warning-box", className="warning-box"),
+                                ],
+                                className="legend-column",
+                            ),
+                            html.Div(
+                                [
+                                    html.H2("Peak candidates", className="section-title table-heading"),
+                                    html.Div(id="peak-table-container"),
+                                ],
+                                className="candidate-column",
+                            ),
                         ],
                         className="workspace-card side-card",
                     ),
@@ -393,14 +421,19 @@ def create_app() -> Dash:
         Input("csv-upload", "contents"),
         Input("view-mode", "value"),
         Input("layer-selection", "value"),
+        Input("panel-layout", "value"),
     )
-    def update_dashboard(contents: str | None, view_mode: str, layer_selection: list[str]):
+    def update_dashboard(
+        contents: str | None, view_mode: str, layer_selection: list[str], panel_layout: str
+    ):
         try:
             frame = generate_demo_dataset() if contents is None else decode_csv(contents)
             source_label = "Synthetic demo" if contents is None else "Local CSV"
             result = analyze_exploratory(frame)
             selected_layers = tuple(layer_selection) if layer_selection else tuple()
-            figure = build_figure(result, view_mode=view_mode, visible_layers=selected_layers)
+            figure = build_figure(
+                result, view_mode=view_mode, visible_layers=selected_layers, panel_layout=panel_layout
+            )
             duration_s = result.raw["time_s"].iloc[-1] - result.raw["time_s"].iloc[0]
             metrics = [
                 metric_card("Dataset", source_label),
