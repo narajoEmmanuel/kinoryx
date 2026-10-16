@@ -1,332 +1,451 @@
+
 """KINORYX Biomechanics Dashboard, an independent local scientific workspace.
 
 Run from the repository root:
     python apps/biomechanics_dashboard/app.py
-
-The dashboard only consumes Gait Detection Engine outputs. Its displayed peaks are
-exploratory signal features, NOT validated gait events or clinical measurements.
 """
 
 import base64
 import binascii
 import io
-from pathlib import Path
+from typing import Iterable
 
 import pandas as pd
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, dcc, html
 
 from kinoryx.demo.synthetic import generate_demo_dataset
-from kinoryx.pipeline import analyze_exploratory
+from kinoryx.pipeline import ExploratoryResult, analyze_exploratory
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 MAX_UPLOAD_ROWS = 200_000
-MAX_DISPLAY_POINTS = 6_000
-COLORS = {"left": "#6CD8C0", "right": "#E6AE76"}
-DEFAULT_LAYERS = ["raw", "filtered", "candidates"]
+TITLE_FONT = "Arial Black, Arial, Helvetica, sans-serif"
+FIGURE_FONT = "Arial, Helvetica, sans-serif"
+COPY_FONT = "Georgia, 'Times New Roman', serif"
+PAGE_BACKGROUND = "#f4efe3"
+FIGURE_BACKGROUND = "#ffffff"
+PANEL_BACKGROUND = "rgba(255, 251, 243, 0.92)"
+PANEL_BORDER = "#d4c7b0"
+TEXT_DARK = "#2f261f"
+TEXT_SOFT = "#645648"
+LEFT_COLOR = "#365d77"
+RIGHT_COLOR = "#a65d3f"
+RAW_ALPHA = 0.38
+SIDE_META = {
+    "left": {"label": "Left", "color": LEFT_COLOR, "dash": "solid", "marker": "circle-open"},
+    "right": {"label": "Right", "color": RIGHT_COLOR, "dash": "dash", "marker": "diamond-open"},
+}
+GRAPH_CONFIG = {
+    "displaylogo": False,
+    "responsive": True,
+    "toImageButtonOptions": {
+        "format": "svg",
+        "filename": "kinoryx_figure",
+        "height": 720,
+        "width": 1200,
+        "scale": 1,
+    },
+}
 
 
 def decode_csv(contents: str) -> pd.DataFrame:
-    """Decode a small in-memory UTF-8 CSV for a LOCAL-only research dashboard."""
     try:
         _, encoded = contents.split(",", 1)
         raw = base64.b64decode(encoded, validate=True)
-    except (AttributeError, ValueError, binascii.Error) as exc:
-        raise ValueError("The file upload could not be decoded.") from exc
+    except (ValueError, binascii.Error) as exc:
+        raise ValueError("Invalid upload") from exc
     if len(raw) > MAX_UPLOAD_BYTES:
-        raise ValueError("File exceeds the 10 MiB prototype limit.")
-    try:
-        frame = pd.read_csv(io.BytesIO(raw))
-    except (pd.errors.ParserError, pd.errors.EmptyDataError, UnicodeDecodeError) as exc:
-        raise ValueError("Unable to read the CSV. Use a UTF-8 encoded file.") from exc
+        raise ValueError("Maximum CSV upload is 10 MiB")
+    frame = pd.read_csv(io.BytesIO(raw))
     if len(frame) > MAX_UPLOAD_ROWS:
-        raise ValueError("File exceeds the 200,000-row prototype limit.")
+        raise ValueError(f"Maximum number of rows is {MAX_UPLOAD_ROWS:,}")
     return frame
 
 
-def build_figure(result, side="both", layers=None):
-    """Plot measured or synthetic signals and engine-generated peak candidates only."""
-    if layers is None:
-        layers = DEFAULT_LAYERS
-    selected = set(layers)
-    fig = go.Figure()
-    for channel in result.info.available_channels:
-        channel_side = channel.split("_", 1)[0]
-        if side != "both" and channel_side != side:
-            continue
-        color = COLORS[channel_side]
-        count = len(result.raw)
-        stride = max(1, (count + MAX_DISPLAY_POINTS - 1) // MAX_DISPLAY_POINTS)
-        indices = list(range(0, count, stride))
-        if indices[-1] != count - 1:
-            indices.append(count - 1)
-        time = result.raw["time_s"].iloc[indices]
-        if "raw" in selected:
-            fig.add_trace(go.Scattergl(
-                x=time, y=result.raw[channel].iloc[indices], mode="lines",
-                name=f"{channel_side.title()} raw",
-                line={"color": color, "width": 1.25, "dash": "dot"},
-                opacity=0.38,
-                hovertemplate="%{x:.3f} s<br>%{y:.2f} °/s<extra>Raw signal</extra>",
-            ))
-        if "filtered" in selected:
-            fig.add_trace(go.Scattergl(
-                x=time, y=result.filtered[channel].iloc[indices], mode="lines",
-                name=f"{channel_side.title()} filtered",
-                line={"color": color, "width": 2.5},
-                hovertemplate="%{x:.3f} s<br>%{y:.2f} °/s<extra>Filtered signal</extra>",
-            ))
-        if "candidates" in selected:
-            candidates = [p for p in result.peaks if p.side == channel_side]
-            fig.add_trace(go.Scatter(
-                x=[p.time_s for p in candidates],
-                y=[p.amplitude_deg_s for p in candidates],
-                mode="markers", name=f"{channel_side.title()} candidate peaks",
-                marker={"size": 9, "symbol": "circle-open", "color": color,
-                        "line": {"width": 2}},
-                hovertemplate="%{x:.3f} s<br>%{y:.2f} °/s<extra>Unvalidated peak</extra>",
-            ))
-
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="#121E23", plot_bgcolor="#121E23",
-        font={"family": "Segoe UI, Arial, sans-serif", "color": "#BCCACE", "size": 12},
-        xaxis={"title": "TIME (s)", "gridcolor": "#293B40", "zeroline": False,
-               "linecolor": "#405157", "showspikes": True, "spikemode": "across"},
-        yaxis={"title": "ANGULAR VELOCITY (°/s)", "gridcolor": "#293B40",
-               "zerolinecolor": "#405157", "linecolor": "#405157"},
-        legend={"orientation": "h", "y": -0.24, "x": 0, "font": {"size": 11}},
-        margin={"l": 72, "r": 20, "t": 26, "b": 86},
-        hovermode="x unified", height=490, uirevision="kinoryx-signal-v1",
-    )
-    return fig
+def _visible_sides(view_mode: str, available_channels: Iterable[str]) -> list[str]:
+    available_sides = [channel.split("_", 1)[0] for channel in available_channels]
+    if view_mode == "left":
+        return ["left"] if "left" in available_sides else available_sides
+    if view_mode == "right":
+        return ["right"] if "right" in available_sides else available_sides
+    return available_sides
 
 
-def _metric(label: str, value: str, description: str = ""):
-    return html.Div([
-        html.P(label, className="metric-label"),
-        html.Div(value, className="metric-value"),
-        html.P(description, className="metric-desc"),
-    ], className="metric-card")
-
-
-def _candidate_table(result, side: str):
-    peaks = [p for p in result.peaks if side == "both" or p.side == side]
-    if not peaks:
-        return html.P("No exploratory peaks in this view.", className="empty-copy")
-    header = html.Thead(html.Tr([
-        html.Th("SIDE"), html.Th("TIME (s)"), html.Th("AMP. (°/s)"), html.Th("SAMPLE"),
-    ]))
-    rows = []
-    for candidate in peaks[:12]:
-        rows.append(html.Tr([
-            html.Td(candidate.side.upper(), className=f"side-{candidate.side}"),
-            html.Td(f"{candidate.time_s:.3f}"),
-            html.Td(f"{candidate.amplitude_deg_s:.2f}"),
-            html.Td(str(candidate.sample_index)),
-        ]))
-    return html.Div([
-        html.Table([header, html.Tbody(rows)], className="candidate-table"),
-        html.P(f"Showing {min(12, len(peaks))} of {len(peaks)} signal peaks. "
-               "These are not initial contacts or toe-offs.", className="table-footnote"),
-    ], className="table-scroll")
-
-
-def _dashboard_metrics(result):
+def build_figure(
+    result: ExploratoryResult,
+    *,
+    view_mode: str = "bilateral",
+    visible_layers: tuple[str, ...] = ("raw", "filtered", "candidates"),
+) -> go.Figure:
+    figure = go.Figure()
     time = result.raw["time_s"]
-    duration = float(time.iloc[-1] - time.iloc[0])
-    return [
-        _metric("RECORDING WINDOW", f"{duration:.2f} s", "From the supplied time axis"),
-        _metric("SAMPLING RATE", f"{result.info.sampling_hz:.1f} Hz", "Estimated from sample times"),
-        _metric("AVAILABLE CHANNELS", str(len(result.info.available_channels)), "Gyroscope demo contract"),
-        _metric("PEAK CANDIDATES", str(len(result.peaks)), "Exploratory, unvalidated"),
-    ]
+    sides = _visible_sides(view_mode, result.info.available_channels)
+    for side in sides:
+        channel = f"{side}_gyro_y_deg_s"
+        if channel not in result.info.available_channels:
+            continue
+        meta = SIDE_META[side]
+        if "raw" in visible_layers:
+            figure.add_trace(
+                go.Scatter(
+                    x=time,
+                    y=result.raw[channel],
+                    mode="lines",
+                    name=f"{meta['label']} raw",
+                    opacity=RAW_ALPHA,
+                    line={"color": meta["color"], "dash": "dot", "width": 1.1},
+                )
+            )
+        if "filtered" in visible_layers:
+            figure.add_trace(
+                go.Scatter(
+                    x=time,
+                    y=result.filtered[channel],
+                    mode="lines",
+                    name=f"{meta['label']} filtered",
+                    line={"color": meta["color"], "dash": meta["dash"], "width": 2.2},
+                )
+            )
+        if "candidates" in visible_layers:
+            peaks = [peak for peak in result.peaks if peak.side == side]
+            figure.add_trace(
+                go.Scatter(
+                    x=[peak.time_s for peak in peaks],
+                    y=[peak.amplitude_deg_s for peak in peaks],
+                    mode="markers",
+                    name=f"{meta['label']} candidate peaks",
+                    marker={
+                        "color": meta["color"],
+                        "size": 8,
+                        "symbol": meta["marker"],
+                        "line": {"color": meta["color"], "width": 1.2},
+                    },
+                )
+            )
+    figure.update_layout(
+        template=None,
+        paper_bgcolor=FIGURE_BACKGROUND,
+        plot_bgcolor=FIGURE_BACKGROUND,
+        height=650,
+        margin={"l": 72, "r": 26, "t": 74, "b": 72},
+        hovermode="x unified",
+        font={"family": FIGURE_FONT, "size": 13, "color": TEXT_DARK},
+        legend={
+            "orientation": "h",
+            "x": 0.0,
+            "y": 1.02,
+            "xanchor": "left",
+            "yanchor": "bottom",
+            "bgcolor": "rgba(255,255,255,0)",
+            "borderwidth": 0,
+            "traceorder": "normal",
+            "font": {"family": FIGURE_FONT, "size": 12, "color": TEXT_DARK},
+        },
+    )
+    figure.update_xaxes(
+        title_text="Time (s)",
+        showline=True,
+        mirror=True,
+        linewidth=1.3,
+        linecolor=TEXT_DARK,
+        ticks="outside",
+        tickwidth=1.0,
+        ticklen=5,
+        tickcolor=TEXT_DARK,
+        showgrid=False,
+        zeroline=False,
+        title_font={"family": FIGURE_FONT, "size": 14, "color": TEXT_DARK},
+        tickfont={"family": FIGURE_FONT, "size": 12, "color": TEXT_DARK},
+    )
+    figure.update_yaxes(
+        title_text="Angular velocity (deg/s)",
+        showline=True,
+        mirror=True,
+        linewidth=1.3,
+        linecolor=TEXT_DARK,
+        ticks="outside",
+        tickwidth=1.0,
+        ticklen=5,
+        tickcolor=TEXT_DARK,
+        showgrid=False,
+        zeroline=True,
+        zerolinewidth=1.0,
+        zerolinecolor="#b8ad97",
+        title_font={"family": FIGURE_FONT, "size": 14, "color": TEXT_DARK},
+        tickfont={"family": FIGURE_FONT, "size": 12, "color": TEXT_DARK},
+    )
+    if not figure.data:
+        figure.add_annotation(
+            text="No visible traces for the current layer and side selection.",
+            x=0.5,
+            y=0.5,
+            xref="paper",
+            yref="paper",
+            showarrow=False,
+            font={"family": FIGURE_FONT, "size": 14, "color": TEXT_SOFT},
+        )
+    return figure
 
 
-def _source_panel(result, synthetic, filename):
-    source = "SYNTHETIC DEMO" if synthetic else "LOCAL CSV"
-    label = "Built-in demonstration" if synthetic else (filename or "Imported CSV")
-    warnings = list(result.info.warnings)
-    details = [
-        ("DATA ORIGIN", source),
-        ("SOURCE", label),
-        ("RECORDS", f"{result.info.rows:,}"),
-        ("VALIDATION", "NOT CLINICALLY VALIDATED"),
-    ]
-    return html.Div([
-        *[html.Div([html.Span(key), html.Strong(value)], className="provenance-row")
-          for key, value in details],
-        html.Div(
-            [html.Strong("Timing warning"), html.P(" ".join(warnings))]
-            if warnings else [html.Strong("Basic timing check"),
-                                   html.P("No sampling irregularity flag. This is not a data-quality certification.")],
-            className="quality-notice" if warnings else "quality-notice quality-ok",
-        ),
-    ])
+def metric_card(label: str, value: str, detail: str = "") -> html.Div:
+    children = [html.Div(label, className="metric-label"), html.Div(value, className="metric-value")]
+    if detail:
+        children.append(html.Div(detail, className="metric-detail"))
+    return html.Div(children, className="metric-card")
 
 
-def _empty_figure(message):
-    fig = go.Figure()
-    fig.add_annotation(text=message, showarrow=False, font={"color": "#E6AE76", "size": 14})
-    fig.update_layout(paper_bgcolor="#121E23", plot_bgcolor="#121E23", height=490,
-                      xaxis={"visible": False}, yaxis={"visible": False})
-    return fig
+def build_peak_table(result: ExploratoryResult, limit: int = 12) -> html.Table:
+    header = html.Thead(
+        html.Tr(
+            [
+                html.Th("Side"),
+                html.Th("Time (s)"),
+                html.Th("Amplitude (deg/s)"),
+                html.Th("Sample"),
+            ]
+        )
+    )
+    body_rows = []
+    for peak in result.peaks[:limit]:
+        body_rows.append(
+            html.Tr(
+                [
+                    html.Td(peak.side.capitalize()),
+                    html.Td(f"{peak.time_s:.3f}"),
+                    html.Td(f"{peak.amplitude_deg_s:.2f}"),
+                    html.Td(str(peak.sample_index)),
+                ]
+            )
+        )
+    if not body_rows:
+        body_rows.append(html.Tr([html.Td("No candidates available for this view.", colSpan=4)]))
+    return html.Table([header, html.Tbody(body_rows)], className="scientific-table")
 
 
-def create_app():
-    assets_folder = str(Path(__file__).parent / "assets")
-    app = Dash(__name__, title="KINORYX | Biomechanics Dashboard", assets_folder=assets_folder)
-    app.layout = html.Div([
-        html.A("Skip to workspace", href="#workspace", className="skip-link"),
-        html.Aside([
-            html.Div([
-                html.Div("K", className="brand-mark"),
-                html.Div([html.Strong("KINORYX"), html.Small("HUMAN MOTION INTELLIGENCE")],
-                         className="brand-name"),
-            ], className="brand-lockup"),
-            html.Div("RESEARCH WORKSPACE", className="sidebar-label"),
-            html.Div([html.Span("01", className="nav-index"), "Signal explorer"],
-                     className="nav-item is-active"),
-            html.Div("COMING LATER", className="sidebar-label sidebar-gap"),
-            html.Div([html.Span("02", className="nav-index"), "Gait events"],
-                     className="nav-item is-planned"),
-            html.Div([html.Span("03", className="nav-index"), "Cycle analysis"],
-                     className="nav-item is-planned"),
-            html.Div([html.Span("04", className="nav-index"), "Reports"],
-                     className="nav-item is-planned"),
-            html.Div([
-                html.Div("RESEARCH PRE-ALPHA", className="foot-heading"),
-                html.P("Local-first tools for open biomechanics. No diagnostic use."),
-                html.Span("VERSION 0.1 / DASHBOARD WORKSPACE", className="foot-version"),
-            ], className="sidebar-foot"),
-        ], className="sidebar", **{"aria-label": "Workspace navigation"}),
-        html.Main([
-            html.Header([
-                html.Div([
-                    html.Div("KINORYX  /  BIOMECHANICS DASHBOARD", className="eyebrow"),
-                    html.H1("Signal explorer"),
-                    html.P("Investigate movement data with transparent signals, source information and exploratory candidates.",
-                           className="page-subtitle"),
-                ]),
-                html.Div([html.Span(className="status-dot"), "LOCAL WORKSPACE"],
-                         className="session-status"),
-            ], className="page-header"),
-            html.Section([
-                html.Div([
-                    html.Div("01 / DATA INPUT", className="section-kicker"),
-                    html.H2("Start with a recording"),
-                    html.P("Explore synthetic demonstration data or import a compatible, non-identifying CSV.",
-                           className="muted-copy"),
-                ]),
-                html.Div([
-                    dcc.Upload(id="csv-upload", children=html.Div([
-                        html.Span("↥", className="upload-icon"),
-                        html.Span([html.Strong("Choose a CSV"), " or drop a file here"]),
-                        html.Small("Canonical gyroscope columns, up to 10 MiB"),
-                    ], className="upload-inner"), className="upload-area", multiple=False,
-                               accept=".csv,text/csv"),
-                    html.Button("Load synthetic demo", id="reset-demo", n_clicks=0,
-                                className="secondary-button", type="button"),
-                ], className="input-actions"),
-            ], className="upload-section"),
-            html.Div(id="status-alert", className="status-alert", role="status"),
-            html.Section(id="workspace", children=[
-                html.Div(id="metrics-grid", className="metrics-grid"),
-                html.Div([
-                    html.Section([
-                        html.Div([
-                            html.Div([html.Div("02 / SIGNAL VIEW", className="section-kicker"),
-                                      html.H2("Angular velocity")]),
-                            html.Div("RAW / FILTERED / CANDIDATES", className="chart-meta"),
-                        ], className="section-heading"),
-                        dcc.Loading(dcc.Graph(id="signal-graph", config={"displaylogo": False,
-                            "scrollZoom": True, "modeBarButtonsToRemove": ["lasso2d", "select2d"]},
-                                               className="signal-graph")),
-                        html.P("Lines may be downsampled for display only. "
-                               "Filtering and candidate extraction use the full imported series.",
-                               className="figure-caption"),
-                    ], className="panel chart-panel"),
-                    html.Aside([
-                        html.Div("DISPLAY CONTROLS", className="section-kicker"),
-                        html.H3("Signal layers"),
-                        dcc.Checklist(id="signal-layers", options=[
-                            {"label": "Raw signal", "value": "raw"},
-                            {"label": "Filtered signal", "value": "filtered"},
-                            {"label": "Candidate peaks", "value": "candidates"},
-                        ], value=DEFAULT_LAYERS, className="layer-checklist",
-                                      inputClassName="layer-input", labelClassName="layer-label"),
-                        html.Div("FOOT SELECTION", className="section-kicker control-divider"),
-                        dcc.RadioItems(id="side-selector", options=[
-                            {"label": "Both", "value": "both"},
-                            {"label": "Left", "value": "left"},
-                            {"label": "Right", "value": "right"},
-                        ], value="both", className="side-selector",
-                                       labelClassName="side-choice"),
-                        html.Div("INTERPRETATION", className="section-kicker control-divider"),
-                        html.P("Markers show amplitude peaks identified by the current engine. "
-                               "They must not be interpreted as steps, initial contacts, or toe-offs.",
-                               className="annotation-copy"),
-                    ], className="panel controls-panel"),
-                ], className="workspace-grid"),
-                html.Div([
-                    html.Section([
-                        html.Div("03 / CANDIDATE INSPECTION", className="section-kicker"),
-                        html.H2("Peak candidates"),
-                        html.Div(id="candidate-table"),
-                    ], className="panel inspection-panel"),
-                    html.Section([
-                        html.Div("04 / SOURCE AND QUALITY", className="section-kicker"),
-                        html.H2("Recording context"),
-                        html.Div(id="source-panel", className="source-panel"),
-                    ], className="panel source-card"),
-                ], className="bottom-grid"),
-            ]),
-            html.Footer("KINORYX IS EXPERIMENTAL RESEARCH SOFTWARE. NOT A MEDICAL DEVICE. "
-                        "DO NOT UPLOAD IDENTIFIABLE PATIENT INFORMATION.", className="footer-note"),
-        ], className="main-content"),
-    ], className="app-shell")
+def build_caption(
+    result: ExploratoryResult,
+    source_label: str,
+    view_mode: str,
+    visible_layers: tuple[str, ...],
+) -> html.Div:
+    panel_descriptor = {
+        "bilateral": "bilateral left-right comparison",
+        "left": "left-foot focused view",
+        "right": "right-foot focused view",
+    }[view_mode]
+    layer_phrase = ", ".join(layer.replace("candidates", "candidate peaks") for layer in visible_layers)
+    warning_copy = (
+        " Sampling irregularity warning: " + "; ".join(result.info.warnings)
+        if result.info.warnings
+        else ""
+    )
+    return html.Div(
+        [
+            html.Div("Figure note", className="caption-title"),
+            html.P(
+                [
+                    html.Strong("Exploratory angular-velocity traces from KINORYX. "),
+                    f"This {panel_descriptor} presents {layer_phrase} for {source_label.lower()} data. ",
+                    "Signals were processed by the current exploratory pipeline and are shown for research inspection only. ",
+                    f"The analysis detected {len(result.peaks)} unvalidated peak candidates; the table shows up to 12. ",
+                    "These candidates are not equivalent to heel strikes, toe-offs, stance phases, or validated gait events.",
+                    warning_copy,
+                ],
+                className="caption-copy",
+            ),
+        ],
+        className="caption-block",
+    )
 
-    @app.callback(Output("csv-upload", "contents"), Input("reset-demo", "n_clicks"),
-                  prevent_initial_call=True)
-    def reset_to_demo(_clicks):
-        return None
+
+def create_app() -> Dash:
+    app = Dash(__name__, title="KINORYX | Biomechanics Dashboard")
+    app.layout = html.Main(
+        [
+            html.Section(
+                [
+                    html.Div("KINORYX", className="brand-kicker"),
+                    html.H1("Biomechanics Dashboard", className="page-title"),
+                    html.P(
+                        "Local-first workspace for article-ready signal inspection, figure export, and transparent exploratory reporting.",
+                        className="page-subtitle",
+                    ),
+                    html.P(
+                        "The visual system follows common figure conventions used by major scientific publishers: restrained typography, legible axes, accessible contrast, and concise legend-style narrative.",
+                        className="page-intro",
+                    ),
+                ],
+                className="hero-panel",
+            ),
+            html.Section(
+                [
+                    html.Div(
+                        [
+                            html.H2("Input", className="section-title"),
+                            html.P(
+                                "Load a canonical CSV or leave the default synthetic demonstration dataset in place.",
+                                className="section-copy",
+                            ),
+                            dcc.Upload(
+                                id="csv-upload",
+                                children=html.Div(
+                                    [
+                                        html.Span("Drop a CSV here or click to select.", className="upload-title"),
+                                        html.Span(
+                                            " Accepted input is local, never uploaded to a remote service.",
+                                            className="upload-note",
+                                        ),
+                                    ]
+                                ),
+                                multiple=False,
+                                accept=".csv,text/csv",
+                                className="upload-box",
+                            ),
+                        ],
+                        className="workspace-card input-card",
+                    ),
+                    html.Div(
+                        [
+                            html.H2("Display controls", className="section-title"),
+                            html.Div(
+                                [
+                                    html.Div("Comparison layout", className="control-label"),
+                                    dcc.RadioItems(
+                                        id="view-mode",
+                                        options=[
+                                            {"label": "Bilateral", "value": "bilateral"},
+                                            {"label": "Left only", "value": "left"},
+                                            {"label": "Right only", "value": "right"},
+                                        ],
+                                        value="bilateral",
+                                        className="radio-grid",
+                                        inputClassName="radio-input",
+                                        labelClassName="radio-label",
+                                    ),
+                                ],
+                                className="control-block",
+                            ),
+                            html.Div(
+                                [
+                                    html.Div("Visible figure layers", className="control-label"),
+                                    dcc.Checklist(
+                                        id="layer-selection",
+                                        options=[
+                                            {"label": "Raw", "value": "raw"},
+                                            {"label": "Filtered", "value": "filtered"},
+                                            {"label": "Candidate peaks", "value": "candidates"},
+                                        ],
+                                        value=["raw", "filtered", "candidates"],
+                                        className="check-grid",
+                                        inputClassName="check-input",
+                                        labelClassName="check-label",
+                                    ),
+                                ],
+                                className="control-block",
+                            ),
+                            html.Div(
+                                "Use the Plotly export control to download an SVG figure for manuscript assembly.",
+                                className="export-note",
+                            ),
+                        ],
+                        className="workspace-card controls-card",
+                    ),
+                ],
+                className="two-column-grid",
+            ),
+            html.Section(id="metrics-row", className="metrics-grid"),
+            html.Section(
+                [
+                    html.Div(
+                        [
+                            html.H2("Signal figure", className="section-title"),
+                            html.P(
+                                "Axes, units, line styles, and text are intentionally restrained to support direct reuse in scientific figures.",
+                                className="section-copy compact-copy",
+                            ),
+                            html.Div(id="status-banner", className="status-banner", role="status"),
+                            dcc.Loading(
+                                dcc.Graph(id="signal-graph", config=GRAPH_CONFIG, className="signal-graph")
+                            ),
+                        ],
+                        className="workspace-card figure-card",
+                    ),
+                    html.Div(
+                        [
+                            html.H2("Legend-style context", className="section-title"),
+                            html.Div(id="figure-caption"),
+                            html.H2("Candidate peak table", className="section-title table-heading"),
+                            html.Div(id="peak-table-container"),
+                            html.Div(id="warning-box", className="warning-box"),
+                        ],
+                        className="workspace-card side-card",
+                    ),
+                ],
+                className="main-grid",
+            ),
+            html.Footer(
+                [
+                    html.P(
+                        "Pre-alpha research software. Unvalidated peak candidates are shown for exploratory inspection only; they are not clinical endpoints, gait phases, or diagnostic outputs.",
+                        className="footer-copy",
+                    )
+                ],
+                className="page-footer",
+            ),
+        ],
+        className="app-shell",
+    )
 
     @app.callback(
         Output("signal-graph", "figure"),
-        Output("metrics-grid", "children"),
-        Output("candidate-table", "children"),
-        Output("source-panel", "children"),
-        Output("status-alert", "children"),
-        Output("status-alert", "className"),
+        Output("status-banner", "children"),
+        Output("metrics-row", "children"),
+        Output("peak-table-container", "children"),
+        Output("figure-caption", "children"),
+        Output("warning-box", "children"),
         Input("csv-upload", "contents"),
-        Input("csv-upload", "filename"),
-        Input("side-selector", "value"),
-        Input("signal-layers", "value"),
+        Input("view-mode", "value"),
+        Input("layer-selection", "value"),
     )
-    def update_workspace(contents, filename, side, layers):
-        synthetic = contents is None
+    def update_dashboard(contents: str | None, view_mode: str, layer_selection: list[str]):
         try:
-            frame = generate_demo_dataset() if synthetic else decode_csv(contents)
+            frame = generate_demo_dataset() if contents is None else decode_csv(contents)
+            source_label = "Synthetic demo" if contents is None else "Local CSV"
             result = analyze_exploratory(frame)
-            label = "SYNTHETIC DATA" if synthetic else "LOCAL CSV"
-            message = (f"{label}  |  {result.info.rows:,} samples  |  "
-                       f"{len(result.peaks)} unvalidated signal peaks  |  "
-                       "No clinical inference")
-            return (
-                build_figure(result, side=side, layers=layers),
-                _dashboard_metrics(result),
-                _candidate_table(result, side),
-                _source_panel(result, synthetic, filename),
-                message, "status-alert status-ok",
+            selected_layers = tuple(layer_selection) if layer_selection else tuple()
+            figure = build_figure(result, view_mode=view_mode, visible_layers=selected_layers)
+            duration_s = result.raw["time_s"].iloc[-1] - result.raw["time_s"].iloc[0]
+            metrics = [
+                metric_card("Data source", source_label, "Deterministic example" if contents is None else "Researcher-supplied file"),
+                metric_card("Duration", f"{duration_s:.2f} s", "Time span represented"),
+                metric_card("Sampling rate", f"{result.info.sampling_hz:.1f} Hz", "Estimated from time_s"),
+                metric_card("Channels", str(len(result.info.available_channels)), ", ".join(result.info.available_channels)),
+                metric_card("Candidate peaks", str(len(result.peaks)), "Exploratory, not validated events"),
+            ]
+            status = (
+                f"{source_label} loaded. Use the export control to save the current figure as SVG for manuscript composition."
             )
-        except (ValueError, TypeError, KeyError, pd.errors.ParserError) as exc:
-            return (
-                _empty_figure("No compatible data to display"),
-                [_metric("SESSION STATUS", "Input rejected", "Check the CSV contract")],
-                html.P("No candidates available.", className="empty-copy"),
-                html.P("No valid recording loaded."),
-                f"Unable to analyze input: {exc}", "status-alert status-error",
+            caption = build_caption(result, source_label, view_mode, selected_layers)
+            warnings = result.info.warnings or [
+                "No sampling or contract warnings detected for the current file."
+            ]
+            warning_children = [
+                html.Div("Methodological notes", className="warning-title"),
+                html.Ul([html.Li(note) for note in warnings], className="warning-list"),
+            ]
+            return figure, status, metrics, build_peak_table(result), caption, warning_children
+        except (ValueError, pd.errors.ParserError, pd.errors.EmptyDataError) as exc:
+            empty = go.Figure()
+            empty.update_layout(
+                paper_bgcolor=FIGURE_BACKGROUND,
+                plot_bgcolor=FIGURE_BACKGROUND,
+                font={"family": FIGURE_FONT, "size": 13, "color": TEXT_DARK},
+                margin={"l": 72, "r": 26, "t": 74, "b": 72},
             )
+            message = f"Input rejected: {exc}"
+            fallback_metrics = [metric_card("Status", "Rejected", message)]
+            return empty, message, fallback_metrics, html.Div(), html.Div(), html.Div()
+
     return app
 
 
