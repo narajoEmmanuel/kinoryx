@@ -16,7 +16,7 @@ The dashboard now adopts an **article-first visual system** designed for researc
 - Layout should prioritize readability: visible axis lines, tick marks, units, restrained decoration, and no dependence on red-versus-green color contrast.
 - Supporting explanatory text should behave like a **figure legend**: a short title followed by a concise description of what is shown and what the symbols mean.
 - Export should support downstream manuscript assembly, so the Plotly download action is configured for **SVG output** by default.
-- The overall KINORYX identity for the dashboard should feel scholarly rather than consumer-tech: quiet surfaces, a bone-toned palette, high contrast, and typography that does not fight with the data.
+- The overall KINORYX identity for the dashboard should feel scholarly rather than consumer-tech: quiet surfaces, a neutral Chat Gray palette, high contrast, and typography that does not fight with the data.
 
 ## Visual system decisions implemented
 
@@ -28,13 +28,13 @@ The dashboard now adopts an **article-first visual system** designed for researc
 
 ### 2. Color strategy
 
-- Primary identity background: **bone-toned off-white** with subtle texture simulation.
+- Primary identity background: **Chat Gray #F5F5F4** (approved Option 01), flat and neutral without gradients or bone texture; white #FFFFFF panels, discreet cool-gray borders and charcoal text.
 - Left and right signals use a **high-contrast, publication-safe pair** rather than red-green.
 - Signal differentiation also relies on **line style and marker shape**, not color alone.
 
 ### 3. Figure behavior
 
-- Exported figure background is plain white (no bone texture, gradients, shadows or brand panels). The bone texture is confined to the surrounding dashboard interface. This protects readability and compatibility with journal manuscript layout.
+- Exported figure background is plain white (#FFFFFF), with no interface tint, gradients, shadows or brand panels. The surrounding interface uses Chat Gray #F5F5F4. This protects readability and compatibility with journal manuscript layout.
 - Gridlines are suppressed by default.
 - Axes remain explicit with tick marks and units.
 - The chart export tool defaults to **SVG**, appropriate for vector-based article assembly.
@@ -79,3 +79,6 @@ The dashboard now adopts an **article-first visual system** designed for researc
 - Elsevier artwork overview: https://www.elsevier.com/about/policies-and-standards/author/artwork-and-media-instructions/artwork-overview
 
 Guidance differs by journal. KINORYX does not claim universal publisher approval or clinical validation. Figure legends are displayed in the interface but are not embedded in exported SVG figures by default; include them in manuscript captions.
+## Visual decision, 15 October 2026
+
+The previously explored warm bone / parchment palette was **rejected**. The user approved **Option 01, Gris Chat (#F5F5F4)**, with white cards, gray dividers and neutral charcoal typography. Do not restore gold/bone textures without explicit approval. Academic figure-export standards remain unchanged, including pure-white plot backgrounds and SVG output.

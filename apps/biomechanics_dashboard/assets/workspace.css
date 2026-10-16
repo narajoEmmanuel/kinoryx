@@ -1,14 +1,14 @@
 :root {
   color-scheme: light;
-  --page-bg: #f4efe3;
-  --page-bg-deep: #eae1d1;
-  --panel-bg: rgba(255, 251, 243, 0.92);
-  --panel-border: #d4c7b0;
-  --ink: #2f261f;
-  --muted: #645648;
+  --page-bg: #F5F5F4;
+  --page-bg-deep: #ECEDEE;
+  --panel-bg: #FFFFFF;
+  --panel-border: #E1E4E3;
+  --ink: #34383A;
+  --muted: #636A6B;
   --left: #365d77;
   --right: #a65d3f;
-  --accent: #8a7558;
+  --accent: #657073;
   --title-font: "Arial Black", Arial, Helvetica, sans-serif;
   --copy-font: Georgia, "Times New Roman", serif;
   --figure-font: Arial, Helvetica, sans-serif;
@@ -19,11 +19,7 @@
 html, body {
   margin: 0;
   min-height: 100%;
-  background:
-    radial-gradient(circle at 20% 18%, rgba(255,255,255,0.5) 0, rgba(255,255,255,0.18) 24%, transparent 46%),
-    radial-gradient(circle at 78% 9%, rgba(213,198,173,0.34) 0, transparent 33%),
-    radial-gradient(circle at 72% 85%, rgba(207,190,165,0.28) 0, transparent 26%),
-    linear-gradient(180deg, var(--page-bg) 0%, #f1eadc 52%, #ece3d2 100%);
+  background: var(--page-bg);
   color: var(--ink);
   font-family: var(--copy-font);
 }
@@ -39,8 +35,7 @@ html, body {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   border-radius: 22px;
-  box-shadow: 0 12px 28px rgba(90, 73, 46, 0.08);
-  backdrop-filter: blur(3px);
+  box-shadow: 0 12px 28px rgba(45, 53, 56, 0.035);
 }
 
 .hero-panel {
@@ -106,7 +101,7 @@ html, body {
 .compact-copy { margin-top: 0; }
 
 .upload-box {
-  border: 1.5px dashed #b9aa90;
+  border: 1.5px dashed #B8BEC0;
   border-radius: 18px;
   min-height: 104px;
   display: flex;
@@ -114,13 +109,13 @@ html, body {
   justify-content: center;
   text-align: center;
   padding: 22px;
-  background: rgba(255,255,255,0.45);
+  background: #FAFAFA;
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 .upload-box:hover {
-  border-color: #8a7558;
-  background: rgba(255,255,255,0.7);
+  border-color: #657073;
+  background: #FFFFFF;
   transform: translateY(-1px);
 }
 .upload-title {
@@ -148,23 +143,23 @@ html, body {
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  border: 1px solid #d6cab6;
+  border: 1px solid #E1E4E3;
   border-radius: 14px;
-  background: rgba(255,255,255,0.42);
+  background: #FAFAFA;
   color: var(--ink);
   font-family: var(--figure-font);
   font-size: 0.95rem;
 }
-.radio-input, .check-input { accent-color: #8a7558; }
+.radio-input, .check-input { accent-color: #657073; }
 .export-note {
   margin-top: 18px;
   padding: 12px 14px;
-  border-left: 3px solid #8a7558;
-  background: rgba(255,255,255,0.38);
+  border-left: 3px solid #657073;
+  background: #F7F8F8;
 }
 
 .metric-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.52), rgba(255,255,255,0.28));
+  background: #FFFFFF;
   border: 1px solid var(--panel-border);
   border-radius: 18px;
   padding: 16px 16px 14px;
@@ -194,15 +189,15 @@ html, body {
   margin: 0 0 14px;
   padding: 10px 12px;
   border-radius: 12px;
-  background: rgba(255,255,255,0.52);
-  border: 1px solid #d8ccb8;
+  background: #F7F8F8;
+  border: 1px solid #E1E4E3;
 }
 .signal-graph { border-radius: 18px; overflow: hidden; }
 .js-plotly-plot .plotly .modebar { background: rgba(255,255,255,0.72) !important; border-radius: 12px; }
 
 .caption-block {
   padding: 14px 0 18px;
-  border-bottom: 1px solid #ddd1bd;
+  border-bottom: 1px solid #E3E6E6;
   margin-bottom: 18px;
 }
 .caption-title {
@@ -223,19 +218,19 @@ html, body {
   border-collapse: collapse;
   font-family: var(--figure-font);
   font-size: 0.93rem;
-  background: rgba(255,255,255,0.4);
-  border: 1px solid #d9cfbf;
+  background: #FFFFFF;
+  border: 1px solid #E1E4E3;
 }
 .scientific-table th,
 .scientific-table td {
   padding: 10px 12px;
-  border-bottom: 1px solid #e4dacb;
+  border-bottom: 1px solid #E9EBEB;
   text-align: left;
 }
 .scientific-table th {
   font-weight: 700;
   color: var(--ink);
-  background: rgba(225,214,193,0.5);
+  background: #F0F2F2;
 }
 .scientific-table tbody tr:last-child td { border-bottom: none; }
 
@@ -243,8 +238,8 @@ html, body {
   margin-top: 16px;
   padding: 14px 15px;
   border-radius: 14px;
-  background: rgba(255,255,255,0.44);
-  border: 1px solid #d6cab7;
+  background: #F8F9F9;
+  border: 1px solid #E1E4E3;
 }
 .warning-title {
   font-family: var(--title-font);
@@ -258,7 +253,7 @@ html, body {
 .page-footer {
   margin-top: 18px;
   padding: 18px 4px 8px;
-  border-top: 1px solid rgba(116, 96, 67, 0.18);
+  border-top: 1px solid rgba(52, 56, 58, 0.12);
 }
 .footer-copy { margin: 0; font-size: 0.95rem; }
 

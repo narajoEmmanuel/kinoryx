@@ -22,12 +22,12 @@ MAX_UPLOAD_ROWS = 200_000
 TITLE_FONT = "Arial Black, Arial, Helvetica, sans-serif"
 FIGURE_FONT = "Arial, Helvetica, sans-serif"
 COPY_FONT = "Georgia, 'Times New Roman', serif"
-PAGE_BACKGROUND = "#f4efe3"
+PAGE_BACKGROUND = "#F5F5F4"
 FIGURE_BACKGROUND = "#ffffff"
-PANEL_BACKGROUND = "rgba(255, 251, 243, 0.92)"
-PANEL_BORDER = "#d4c7b0"
-TEXT_DARK = "#2f261f"
-TEXT_SOFT = "#645648"
+PANEL_BACKGROUND = "#FFFFFF"
+PANEL_BORDER = "#E1E4E3"
+TEXT_DARK = "#34383A"
+TEXT_SOFT = "#636A6B"
 LEFT_COLOR = "#365d77"
 RIGHT_COLOR = "#a65d3f"
 RAW_ALPHA = 0.38
@@ -170,7 +170,7 @@ def build_figure(
         showgrid=False,
         zeroline=True,
         zerolinewidth=1.0,
-        zerolinecolor="#b8ad97",
+        zerolinecolor="#BDC2C3",
         title_font={"family": FIGURE_FONT, "size": 14, "color": TEXT_DARK},
         tickfont={"family": FIGURE_FONT, "size": 12, "color": TEXT_DARK},
     )
