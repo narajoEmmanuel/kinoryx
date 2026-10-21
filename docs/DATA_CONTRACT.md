@@ -15,7 +15,8 @@ The excerpt is illustrative and too short for actual filtering. Use `kinoryx dem
 - Samples must be numeric and finite. At least 20 rows are required.
 - The Y-axis convention and positive peaks are synthetic demo choices, **not** Xsens guarantees.
 - Sampling frequency is inferred from the median time interval, with warnings for deviations.
-- Large gaps, orientation frames, resampling, full tri-axial fields and vendor metadata are not implemented.
+- Large gaps are treated as independent filtering segments. Orientation frames,
+  resampling, full tri-axial fields and vendor metadata are not implemented.
 - These demo columns do not encode independent initial contact/toe-off ground truth.
 
 Real Xsens MVNX or vendor CSV files should not be imported until exact schemas, sensor positioning, versions, units and coordinate frames are known.

@@ -4,6 +4,11 @@ KINORYX has one modular repository and two public components.
 
 **Gait Detection Engine** is a vendor-neutral, headless Python package in `src/kinoryx`. It owns data parsing, preprocessing, exploratory detection, eventual event inference, metrics and scientific validation.
 
+Filtering is configured through immutable `FilterSpec` values. The engine
+stores a resolved `FilterReport` per channel so filter family, frequencies,
+order, phase behavior, coefficient form and independently processed segments
+remain auditable. See [Filtering engine](FILTERING_ENGINE.md).
+
 **Biomechanics Dashboard** lives in `apps/biomechanics_dashboard`, imports the engine and owns visualization, local file loading, user feedback, future human annotation and reporting.
 
 Dependency direction: `dashboard -> engine`, never the reverse.

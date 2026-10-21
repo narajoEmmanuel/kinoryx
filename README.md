@@ -43,6 +43,11 @@ MIT licensed code. The KINORYX name and third-party data are not licensed by MIT
 
 See [architecture](docs/ARCHITECTURE.md), [data contract](docs/DATA_CONTRACT.md), [validation](docs/SCIENTIFIC_VALIDATION.md), [security](docs/SECURITY_AND_PRIVACY.md) and [contributing](CONTRIBUTING.md).
 
+The engine includes a compact, reproducible filtering API for Butterworth and
+linear-phase FIR designs, causal or zero-phase application, discontinuity-safe
+segmentation and frequency-response inspection. See the
+[filtering engine](docs/FILTERING_ENGINE.md) for its API and scientific limits.
+
 ## Biomechanics Dashboard workspace (experimental)
 
 A focused local signal-exploration workspace is being developed independently under `apps/biomechanics_dashboard/`.
