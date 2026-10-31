@@ -15,6 +15,8 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from dash import Dash, Input, Output, dcc, html
+from flask import Flask
+from kinoryx.landing import HOME_HTML
 
 from kinoryx.demo.synthetic import generate_demo_dataset
 from kinoryx.pipeline import ExploratoryResult, analyze_exploratory
@@ -264,7 +266,20 @@ def build_caption(
 
 
 def create_app() -> Dash:
-    app = Dash(__name__, title="KINORYX | Biomechanics Dashboard")
+    # The root route is now a neutral landing screen, while the full original
+    # Dash workspace is preserved unchanged under /dashboard/.
+    server = Flask(__name__)
+
+    @server.get("/")
+    def home():
+        return HOME_HTML
+
+    app = Dash(
+        __name__,
+        server=server,
+        url_base_pathname="/dashboard/",
+        title="KINORYX | Biomechanics Dashboard",
+    )
     app.layout = html.Main(
         [
             html.Section(
@@ -274,6 +289,9 @@ def create_app() -> Dash:
                     html.P(
                         "Explore movement signals. Export figures for research.",
                         className="page-subtitle",
+                    ),
+                    html.A(
+                        "Home", href="/", className="lab-nav-link",
                     ),
                     html.A(
                         "Open EMG research laboratory",
