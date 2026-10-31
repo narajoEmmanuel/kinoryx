@@ -10,6 +10,7 @@ pytest.importorskip("plotly")
 
 from kinoryx.io.xsens_emg import EmgChannel, EmgRecording
 from kinoryx.research_lab import make_emg_figure, preview_transform
+from kinoryx.plot_layout import plan_subplot_layout, wrap_plot_title
 
 
 def _synthetic() -> EmgRecording:
@@ -33,10 +34,10 @@ def test_original_is_always_present_in_comparison():
     sample = _synthetic()
     raw = make_emg_figure(sample, "all", 0, 1, "raw")
     assert len(raw.data) == 2
-    assert all("original" in trace.name for trace in raw.data)
+    assert all("raw EMG" in trace.name for trace in raw.data)
     compared = make_emg_figure(sample, "all", 0.1, 0.25, "rms")
     assert len(compared.data) == 4
-    assert sum("original" in trace.name for trace in compared.data) == 2
+    assert sum("raw EMG" in trace.name for trace in compared.data) == 2
     assert all(len(trace.x) == 500 for trace in compared.data)
 
 
@@ -83,5 +84,31 @@ def test_dashboard_serves_lab_on_same_localhost_server():
     assert main_response.status_code == 200
     assert lab_response.status_code == 200
     assert b"Biomechanics Dashboard" in main_response.data
-    assert b"Laboratorio EMG" in lab_response.data
+    assert b"EMG Research Laboratory" in lab_response.data
     assert b"Biomechanics Dashboard" not in lab_response.data
+
+
+def test_emg_chart_has_one_shared_y_axis_label():
+    recording = _synthetic()
+    figure = make_emg_figure(recording, "all", 0, 1, "raw")
+    assert all(axis.title.text is None for axis in (figure.layout.yaxis, figure.layout.yaxis2))
+    captions = [note for note in figure.layout.annotations
+                if "EMG amplitude (unit not established)" in note.text]
+    assert len(captions) == 1
+    assert figure.layout.height > 460
+
+
+def test_plot_layout_expands_when_scientific_titles_are_long():
+    short = plan_subplot_layout(["Right rectus femoris | Raw EMG"] * 4, cols=1)
+    long_title = (
+        "Right rectus femoris | Raw EMG | an unusually detailed scientific "
+        "annotation covering an extended multi-line acquisition description "
+        "that must never collide with another panel or axis label"
+    )
+    longer = plan_subplot_layout([long_title] * 4, cols=1)
+    assert longer.height > short.height
+    assert longer.vertical_spacing > short.vertical_spacing
+    assert "<br>" in longer.titles[0]
+    escaped, lines = wrap_plot_title("<test> & signal", 10)
+    assert "&lt;" in escaped and "&amp;" in escaped
+    assert lines >= 2
