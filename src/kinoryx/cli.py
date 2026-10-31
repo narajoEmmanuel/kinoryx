@@ -5,6 +5,7 @@ from pathlib import Path
 from kinoryx.demo.synthetic import generate_demo_dataset
 from kinoryx.io.csv import read_csv, validate_frame
 from kinoryx.io.xsens_emg import export_mvne_csv, read_mvne
+from kinoryx.io.xsens_session import verify_research_session
 from kinoryx.pipeline import analyze_exploratory
 
 
@@ -18,12 +19,29 @@ def main() -> None:
     emg_export = sub.add_parser("export-emg", help="Export local MVNE EMG values without scaling")
     emg_export.add_argument("mvne")
     emg_export.add_argument("--output", help="CSV destination (default: ignored data_local/)")
+    session_check = sub.add_parser("verify-session", help="Verify approved MVN/Cometa source bundle")
+    session_check.add_argument("directory", nargs="?", default="data_local")
+    session_check.add_argument(
+        "--manifest", default="examples/research/EMG2_Squats.manifest.json"
+    )
     args = parser.parse_args()
     if args.command == "demo":
         target = Path("data_local/demo_synthetic.csv")
         target.parent.mkdir(parents=True, exist_ok=True)
         generate_demo_dataset().to_csv(target, index=False)
         print(f"Saved SYNTHETIC demonstration to {target}")
+        return
+    if args.command == "verify-session":
+        result = verify_research_session(args.directory, args.manifest)
+        print(f"Verified dataset: {result['dataset_id']}")
+        for name in result["verified_files"]:
+            print(f"  SHA-256 / size OK: {name}")
+        print(
+            f"EMG: {result['emg_channel_count']} channels, "
+            f"{result['emg_samples_per_channel']} samples/channel, "
+            f"{result['emg_sampling_hz']:g} Hz"
+        )
+        print(result["limitations"])
         return
     if args.command in ("inspect-emg", "export-emg"):
         info = read_mvne(args.mvne)
