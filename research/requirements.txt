@@ -1,0 +1,3 @@
+# Dependencies used only by this disposable study workspace.
+# Core numpy, pandas and scipy are installed via 'pip install -e ".[dev]".
+matplotlib>=3.8,<4
