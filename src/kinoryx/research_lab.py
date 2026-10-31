@@ -213,7 +213,7 @@ def stage_navigation(active: str):
             href=f"/lab/{slug}",
             className="lab-stage-link" + (" is-active" if slug == active else ""),
         )
-        for idx, (slug, title) in enumerate(STAGES, start=1)
+        for slug, title in STAGES
     ]
 
 
@@ -290,6 +290,41 @@ def exploration_content(rec: EmgRecording):
                             html.H2("View", className="section-title"),
                             html.Div(
                                 [
+                                    html.Label("Channels", className="control-label"),
+                                    dcc.RadioItems(
+                                        id="lab-view",
+                                        options=[
+                                            {"label": "All channels", "value": "all"},
+                                            {"label": "Single channel", "value": "single"},
+                                            {"label": "Compare", "value": "compare"},
+                                        ],
+                                        value="all",
+                                        inline=True,
+                                        className="lab-choice-list lab-view-choices",
+                                    ),
+                                ],
+                                className="lab-view-select",
+                            ),
+                            html.Div(
+                                [
+                                    dcc.Dropdown(
+                                        id="lab-single-channel",
+                                        options=[
+                                            {"label": academic_channel_name(ch.name),
+                                             "value": str(ch.id)}
+                                            for ch in rec.channels
+                                        ],
+                                        value=str(rec.channels[0].id),
+                                        clearable=False,
+                                        searchable=False,
+                                    ),
+                                ],
+                                id="lab-channel-select-wrap",
+                                className="lab-single-select",
+                                style={"display": "none"},
+                            ),
+                            html.Div(
+                                [
                                     html.Div(
                                         [
                                             html.Label("Arrangement", className="control-label"),
@@ -306,6 +341,8 @@ def exploration_content(rec: EmgRecording):
                                             ),
                                         ],
                                         className="lab-control-block",
+                                        id="lab-arrangement-wrap",
+                                        style={"display": "none"},
                                     ),
                                     html.Div(
                                         [
@@ -357,19 +394,29 @@ def exploration_content(rec: EmgRecording):
                         ],
                         className="lab-workspace-heading",
                     ),
-                    html.Div(
-                        recording_palette(rec),
-                        className="lab-source-list",
-                    ),
+                    html.Div(recording_palette(rec), className="lab-source-list"),
                     html.Div(
                         [
                             workspace_slot("left", "A"),
-                            workspace_slot("right", "B"),
+                            html.Div(
+                                workspace_slot("right", "B"),
+                                id="lab-panel-b",
+                                style={"display": "none"},
+                            ),
                         ],
                         className="lab-drop-grid",
                     ),
+                    html.Div(
+                        "Drop a signal here to add Panel B",
+                        id="lab-add-b-target",
+                        className="emg-dropzone lab-mini-b",
+                        style={"display": "none"},
+                        **{"data-slot": "right"},
+                    ),
                 ],
+                id="lab-compare-controls",
                 className="lab-signal-controls",
+                style={"display": "none"},
             ),
             html.Div(
                 [
@@ -485,18 +532,13 @@ def build_layout() -> html.Main:
             dcc.Location(id="lab-location", refresh=False),
             dcc.Store(
                 id="lab-workspace", storage_type="session",
-                data={"left": ["0"], "right": ["2"]},
+                data={"left": ["0"], "right": []},
             ),
             html.Div(id="lab-workspace-hook", style={"display": "none"}),
             html.Header(
                 [
-                    html.Div(
-                        [
-                            html.A("KINORYX", href="/", className="brand-kicker lab-brand"),
-                            html.H1("EMG Research Laboratory", className="page-title"),
-                        ],
-                        className="lab-header-brand",
-                    ),
+                    html.A("KINORYX", href="/", className="lab-brand"),
+                    html.H1("Laboratory", id="lab-current-title", className="lab-current-title"),
                     html.Nav(
                         [
                             html.A("Home", href="/"),
@@ -505,7 +547,7 @@ def build_layout() -> html.Main:
                         className="lab-top-links",
                     ),
                 ],
-                className="lab-product-header hero-panel",
+                className="lab-product-header",
             ),
             html.Nav(
                 id="lab-stage-nav", className="lab-stage-nav",
