@@ -334,3 +334,131 @@
   .kinoryx-laboratory .lab-stage-link { flex: 1 1 50%; }
   .kinoryx-laboratory .lab-drop-grid { grid-template-columns: 1fr; }
 }
+
+/* Compact working header: reuse the existing palette and typography. */
+.app-shell.kinoryx-laboratory {
+  padding-top: 16px;
+}
+.kinoryx-laboratory .lab-product-header {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 1fr);
+  align-items: center;
+  min-height: 49px;
+  padding: 6px 0 13px;
+  margin: 0 0 14px;
+  gap: 12px;
+}
+.kinoryx-laboratory .lab-brand {
+  font-family: var(--figure-font);
+  font-size: .77rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  margin: 0;
+  align-self: center;
+}
+.kinoryx-laboratory .lab-current-title {
+  justify-self: center;
+  margin: 0;
+  text-align: center;
+  font-family: var(--title-font);
+  font-size: clamp(.85rem, 1.25vw, 1.05rem);
+  font-weight: 900;
+  line-height: 1.35;
+  color: var(--heading-blue);
+  overflow-wrap: anywhere;
+}
+.kinoryx-laboratory .lab-top-links {
+  justify-content: flex-end;
+  padding: 0;
+  gap: 16px;
+}
+.kinoryx-laboratory .lab-top-links a {
+  font-size: .78rem;
+  font-weight: 600;
+}
+/* Notebook tabs are centered and gently curved, with a quiet active state. */
+.kinoryx-laboratory .lab-stage-nav {
+  justify-content: center;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0 0 24px;
+  padding: 0 8px;
+}
+.kinoryx-laboratory .lab-stage-link {
+  align-items: center;
+  justify-content: center;
+  min-height: 37px;
+  padding: 9px clamp(10px, 1.4vw, 20px);
+  margin-bottom: -1px;
+  border: 1px solid transparent;
+  border-radius: 10px 10px 0 0;
+  background: transparent;
+  font: 500 .79rem/1.4 var(--figure-font);
+  color: var(--muted);
+  text-align: center;
+  white-space: normal;
+}
+.kinoryx-laboratory .lab-stage-link:hover {
+  border-color: var(--panel-border);
+  border-bottom-color: transparent;
+  background: var(--panel-bg);
+}
+.kinoryx-laboratory .lab-stage-link.is-active {
+  border: 1px solid var(--panel-border);
+  border-bottom-color: var(--page-bg);
+  background: var(--page-bg);
+  color: var(--heading-blue);
+  font-weight: 700;
+  box-shadow: none;
+}
+.kinoryx-laboratory .lab-view-select { margin: 0 0 12px; }
+.kinoryx-laboratory .lab-view-choices { gap: 8px 18px; }
+.kinoryx-laboratory .lab-single-select {
+  max-width: 420px;
+  min-width: 0;
+  margin: 5px 0 13px;
+  font-family: var(--figure-font);
+  font-size: .85rem;
+}
+.kinoryx-laboratory .lab-single-select .Select-control {
+  border-radius: 3px;
+  border-color: var(--panel-border);
+}
+.kinoryx-laboratory .lab-drop-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.kinoryx-laboratory .lab-mini-b {
+  width: fit-content;
+  max-width: 100%;
+  min-height: 32px;
+  margin-bottom: 19px;
+  padding: 7px 11px;
+  color: var(--muted);
+  font: .76rem/1.3 var(--figure-font);
+  border: 1px dashed var(--panel-border);
+  background: transparent;
+}
+.kinoryx-laboratory .lab-mini-b.is-dragover {
+  border-color: var(--accent);
+  background: var(--panel-bg);
+}
+@media (max-width: 680px) {
+  .kinoryx-laboratory .lab-product-header {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "brand nav" "title title";
+    row-gap: 9px;
+  }
+  .kinoryx-laboratory .lab-brand { grid-area: brand; }
+  .kinoryx-laboratory .lab-current-title { grid-area: title; }
+  .kinoryx-laboratory .lab-top-links { grid-area: nav; }
+  .kinoryx-laboratory .lab-stage-nav { justify-content: center; gap: 3px; }
+  .kinoryx-laboratory .lab-stage-link {
+    flex: 0 1 auto;
+    font-size: .72rem;
+    min-height: 33px;
+    padding: 8px 10px;
+  }
+}
