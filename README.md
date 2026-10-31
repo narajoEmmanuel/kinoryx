@@ -35,7 +35,13 @@ Open http://127.0.0.1:8050 . Demo data are synthetic and no sensor equipment is 
 - `docs/`: data contract, architecture, scientific validation, roadmap, privacy
 - `examples/`: reproducible open demonstrations
 
-The dashboard imports the engine. The engine must never import the dashboard or Plotly. Real Xsens exports are **not supported yet** until formats, coordinate frames, units and metadata are verified. The starter CSV contract uses explicit `time_s` and `left_gyro_y_deg_s` / `right_gyro_y_deg_s`, for demonstration only.
+The dashboard imports the engine. The engine must never import the dashboard or Plotly. Real Xsens motion exports are **not supported yet** until formats, coordinate frames, units and metadata are verified. A separate local-only reader for Xsens MVN external EMG XML (Cometa channels) preserves raw values without claiming synchronization or validated biomechanics. The starter CSV contract uses explicit `time_s` and `left_gyro_y_deg_s` / `right_gyro_y_deg_s`, for demonstration only.
+
+## Biomechanics reference and external EMG ingestion
+
+The project now tracks a [user-provided Qualisys web report and an inspected Xsens/Cometa EMG example](docs/RESEARCH_SOURCES.md) as foundational research references. The specific Qualisys report's metrics remain unverified, and the sources are not assumed to be synchronized or from the same session. Only code, tests and non-sensitive data provenance are kept in GitHub. Human recordings stay local.
+
+Use `kinoryx inspect-emg data_local/your_recording.mvne` to inspect MVNE metadata or `kinoryx export-emg data_local/your_recording.mvne` for a raw-value CSV plus a JSON metadata file. This path is **not** the demonstration gait-event processing pipeline; EMG units, normalization and validation remain unresolved.
 
 ## License and privacy
 
