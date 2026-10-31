@@ -2,7 +2,7 @@
   "schema": "kinoryx.research-session-manifest.v1",
   "dataset_id": "xsens-cometa-emg2-squats",
   "approval_status": "approved by supplying user as a KINORYX research reference on 2026-10-30",
-  "distribution": "local-only: original recordings must not be published in the public GitHub repository",
+  "distribution": "published on public GitHub in the study branch at user's explicit request on 2026-10-31; recording content not automatically licensed under repository's MIT software license",
   "provenance": "original user-provided files, inspected locally; no calibrated signal or study protocol supplied",
   "session_filename": "EMG2_Squats.mvns",
   "session_label_in_source": "EMG2_Walkig",
@@ -30,5 +30,6 @@
   "external_report": {
     "url": "https://report.qualisys.com/r/f8pMFlrTA/details",
     "relationship": "independent report reference; no verified shared subject, session or synchronization"
-  }
+  },
+  "publication_status": "all three original files present in research/source_data; Git SHA verified for MVN against source; research only"
 }
