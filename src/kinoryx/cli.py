@@ -4,6 +4,7 @@ from pathlib import Path
 
 from kinoryx.demo.synthetic import generate_demo_dataset
 from kinoryx.io.csv import read_csv, validate_frame
+from kinoryx.io.xsens_emg import export_mvne_csv, read_mvne
 from kinoryx.pipeline import analyze_exploratory
 
 
@@ -13,12 +14,27 @@ def main() -> None:
     sub.add_parser("demo", help="Write an explicitly synthetic CSV")
     for action in ("inspect", "explore"):
         sub.add_parser(action).add_argument("csv")
+    sub.add_parser("inspect-emg", help="Inspect local MVNE EMG channel metadata").add_argument("mvne")
+    emg_export = sub.add_parser("export-emg", help="Export local MVNE EMG values without scaling")
+    emg_export.add_argument("mvne")
+    emg_export.add_argument("--output", help="CSV destination (default: ignored data_local/)")
     args = parser.parse_args()
     if args.command == "demo":
         target = Path("data_local/demo_synthetic.csv")
         target.parent.mkdir(parents=True, exist_ok=True)
         generate_demo_dataset().to_csv(target, index=False)
         print(f"Saved SYNTHETIC demonstration to {target}")
+        return
+    if args.command in ("inspect-emg", "export-emg"):
+        info = read_mvne(args.mvne)
+        print(f"{info.sample_count} samples/channel; {info.sampling_hz:g} Hz; {info.sample_span_s:.3f} s span")
+        for channel in info.channels:
+            print(f"  ch{channel.id}: {channel.name} ({channel.source} {channel.source_channel})")
+        print("UNVALIDATED RAW EMG. Units and absolute sync unknown; not gait events.")
+        if args.command == "export-emg":
+            output = args.output or str(Path("data_local") / f"{Path(args.mvne).stem}_emg.csv")
+            csv_path, metadata_path = export_mvne_csv(args.mvne, output)
+            print(f"Local export: {csv_path} | metadata: {metadata_path}")
         return
     frame = read_csv(args.csv)
     info = validate_frame(frame)

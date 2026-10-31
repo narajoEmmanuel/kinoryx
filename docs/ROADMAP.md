@@ -18,6 +18,12 @@
 - Evaluate timing error and omissions across walking conditions and pathological gait.
 - Support uncertainty, manual correction and transparent versioned analysis.
 
+## Newly available local research ingestion
+
+- Read scalar MVNE external-channel EMG XML into source-scale samples, then export an optional CSV plus provenance metadata.
+- Document the user-supplied Xsens/Cometa recording and Qualisys report without publishing recordings or asserting their equivalence.
+- Still required: calibrated units, muscle/electrode protocol, reference event annotations, Qualisys report verification, and synchronization before quantitative comparison.
+
 ## Later product milestones
 
 - Reproducible cycle-normalized plots, bilateral metrics and report exports.

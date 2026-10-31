@@ -11,3 +11,7 @@ KINORYX intends to support affordable, reproducible research without making pati
 - Public examples should be synthetic or legally redistributable, clearly labeled.
 - MIT licensing covers project code, not restricted recordings, Xsens vendor technology, patient consent or trademarks.
 - Clinical use would require independent scientific, usability, privacy and regulatory validation.
+
+## Research source imports
+
+Original `.mvn`, `.mvns` and `.mvne` files, derived EMG CSVs, exported Qualisys reports, and user-specific study artifacts belong in locally access-controlled `data_local/` (or equivalent excluded storage), **never GitHub**. Extensions are also ignored as a second guard. The reader validates file size and XML/finite samples, but import does not establish informed consent, anonymization, calibration, safe distribution or clinical validity. Avoid posting any identifying values in issues or CI logs. The Qualisys link is a research pointer, not proof that its underlying report can be redistributed.

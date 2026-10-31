@@ -23,3 +23,8 @@ clinical_data/
 *.parquet
 .DS_Store
 Thumbs.db
+
+# Proprietary motion recordings and external signals
+*.mvn
+*.mvns
+*.mvne
