@@ -554,6 +554,7 @@ def build_layout() -> html.Main:
                 **{"aria-label": "Laboratory research stages"},
             ),
             html.Div(id="lab-stage-content"),
+            html.Footer("KINORYX", className="kinoryx-bottom-bar"),
         ],
         className="app-shell kinoryx-laboratory",
     )
