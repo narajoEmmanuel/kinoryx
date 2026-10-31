@@ -19,6 +19,19 @@ Abre en el navegador:
 
 Hay un enlace a la vista de EMG en el encabezado del dashboard original, y un enlace de retorno dentro del laboratorio. Si el puerto 8050 ya está ocupado por un servidor anterior, detenlo con Ctrl+C en aquella terminal antes de iniciarlo.
 
+## Navegación compacta y vistas EMG (ajuste de interfaz)
+
+**2026-10-31, revisión del usuario:** la cabecera de Laboratory es una barra de trabajo baja, con KINORYX a la izquierda, el nombre de la subpágina centrado, y Home/Dashboard a la derecha. Las cuatro subpestañas permanecen centradas con un borde fino, esquinas superiores suavemente redondeadas y selección discreta, como hojas de un cuaderno. Se conservan exclusivamente las variables de fuentes y colores originales del proyecto.
+
+En **Exploratory Analysis**, el selector `Channels` restablece tres vistas sin procesar:
+- `All channels` muestra los cuatro canales del XML en sus gráficas individuales, como en el laboratorio inicial.
+- `Single channel` muestra un selector del canal y **una gráfica a ancho completo**.
+- `Compare` habilita la biblioteca arrastrable de señales, Panel A y las opciones `Side by side`, `Stacked` y `Overlay`.
+
+**Panel B es condicional:** no se dibuja su gráfica ni un cuadro de tamaño completo mientras esté vacío. En vista de comparación, se muestra una zona pequeña para soltar un canal en B, o se puede utilizar el botón `B` de cualquier señal. Cuando B contiene canales, aparece como un segundo panel; al quitar su última señal vuelve a ocultarse. `Reset` regresa a Panel A con solo el primer canal y B vacío. Las tres vistas comparten los controles temporales `Window` y `Start (s)`.
+
+El modo exploratorio sigue mostrando **solo muestras originales**. El proceso de comparación de señales filtradas permanece reservado a etapas posteriores, sin alterar los datos originales ni añadir supuestos fisiológicos.
+
 ## Regla visual, corrección solicitada por el usuario
 
 **2026-10-31:** la variante inicial del rediseño tenía exceso de bloques de texto e introdujo colores y tipografías no autorizados. Se corrigió la página \`Exploratory Analysis\` para recuperar la jerarquía anterior: título original de KINORYX, resumen \`Recording\` y controles \`View\` en una franja superior, biblioteca compacta de señales y **gráficas a ancho completo**. La navegación de cuatro etapas y las capacidades de arrastrar, comparar lado a lado, apilar o superponer siguen activas.
