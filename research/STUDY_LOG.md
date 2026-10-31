@@ -6,9 +6,9 @@ Fecha de apertura: 2026-10-30. Rama: `study/xsens-cometa-qualisys-20261030`.
 | --- | --- | --- | --- | --- |
 | 1 | `EMG2_Squats.mvns` | XML v2, etiqueta `EMG2_Walkig`, dos referencias a MVN/MVNE, offsets declarados cero | Ejercicio real y sincronización instrumental no verificados | Lección 01 ejecutada en Cursor, lectura correcta |
 | 2 | `EMG2_Squats-200714130240.mvne` | 4 canales de Cometa, 2000 Hz, 16527 muestras/canal | Unidad, ganancia, filtrado, artefactos, electrodos, alineación temporal | Inspección ejecutada en Cursor, guía 02 disponible |
-| 3 | `EMG2_Squats.mvn` | Archivo binario original inspeccionado fuera de GitHub y registrado mediante SHA-256 | Formato decodificado, unidades, frames, segmentos, tiempo, ángulos | Binario aún no transferido a GitHub |
+| 3 | `EMG2_Squats.mvn` | Archivo binario original inspeccionado fuera de GitHub y registrado mediante SHA-256 | Formato decodificado, unidades, frames, segmentos, tiempo, ángulos | Binario incorporado a GitHub con tamaño y SHA-256 verificados; decodificación pendiente |
 | 4 | `EMG2_Squats_emg.csv` + `*.metadata.json` | Derivados locales del EMG original | Fidelidad, limitaciones de tiempo relativo y consistencia | Pendiente |
-| 5 | Reporte Qualisys | URL documentada | Contenido verificable, permisos, relación con la sesión | Pendiente |
+| 5 | Reporte Qualisys | Vista de resultados inspeccionada y documentada, sin relación probada con Xsens | Página Findings, datos numéricos de curvas y controles interactivos no verificados | Auditoría separada completada dentro del acceso de lectura |
 
 ## Registro de sesiones
 
@@ -33,3 +33,11 @@ Fecha de apertura: 2026-10-30. Rama: `study/xsens-cometa-qualisys-20261030`.
 **Preguntas abiertas:** ¿es caminata o sentadilla?, ¿hay exportación MVNX del movimiento?, ¿cómo fueron colocados los electrodos?, ¿es el mismo ensayo que el reporte Qualisys?
 
 **Limitaciones:** no interpretar valores EMG como amplitud calibrada ni inferir cinemática de bytes no decodificados.
+
+### Sesión 03: archivo MVN y auditoría del reporte web
+
+**MVN:** incorporación completada el 2026-10-31 en `research/source_data/EMG2_Squats.mvn`. Verificación de Git blob `90760d5756b2e4c60f9426341ad43d57cd95863b`, tamaño 4,672,353 bytes, SHA-256 comprobado durante restauración en GitHub Actions. **Sin decodificar todavía.**
+
+**Qualisys:** inspección directa de la página `Test results` del reporte GaitCAST Full body (Visual3D). Informe detallado [REPORT_AUDIT_2026-10-31.md](qualisys/REPORT_AUDIT_2026-10-31.md). Se identifican siete grupos de análisis, tres ensayos visibles, EMG bilateral tibial anterior, panel video/3D, referencias y opciones de PDF. La página `Findings` y algunas interacciones requieren comprobación adicional. **No existe prueba de que Qualisys corresponda a la misma sesión Xsens/Cometa.**
+
+**Decisión de orden:** no comenzar la siguiente lección sobre análisis fisiológico EMG hasta resolver el alcance restante del reporte web solicitado por el usuario.
