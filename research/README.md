@@ -4,6 +4,24 @@
 
 Propósito: comprender el conjunto suministrado Xsens/Cometa (`.mvns`, `.mvn`, `.mvne`, CSV y metadatos) mediante Python en Cursor y conservar conclusiones sobre la dirección futura de KINORYX. Ningún experimento de esta rama representa funcionalidad aprobada del producto.
 
+## Actualizar el laboratorio ya creado (tu caso, Cursor en Windows)
+
+La rama y el worktree ya están creados en `C:\dev\kinoryx-study`. **No** vuelvas a ejecutar `git worktree add`; solo actualiza la rama experimental:
+
+```powershell
+cd C:\dev\kinoryx-study
+git pull --ff-only origin study/xsens-cometa-qualisys-20261030
+```
+
+Ya cuentas con Python 3.13.5 en el entorno local y completaste 33 pruebas con éxito y 1 omitida. La carpeta `.venv` no se modifica por el pull.
+
+**Primer estudio guiado:** [Lección 01, MVNS](lessons/01_MVNS.md) y su programa [`01_mvns.py`](lessons/01_mvns.py). Ejecuta desde la raíz:
+
+```powershell
+.\.venv\Scripts\python.exe -m kinoryx.cli verify-session data_local
+.\.venv\Scripts\python.exe research\lessons\01_mvns.py
+```
+
 ## Abrir sin alterar tu carpeta de producción (Windows PowerShell)
 
 En una terminal **dentro de la carpeta existente de Kinoryx**:
