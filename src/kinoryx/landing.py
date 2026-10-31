@@ -11,16 +11,16 @@ HOME_HTML = """<!DOCTYPE html>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>KINORYX | Home</title>
   <style>
-    :root { color-scheme: light; --ink: #18272D; --rule: #CAD2D4; --blue: #235D86; }
+    :root { color-scheme: light; --ink: #34383A; --rule: #E1E4E3; --blue: #0847A6; --muted: #636A6B; --page-bg: #F5F5F4; --title-font: "Arial Black", Arial, Helvetica, sans-serif; --copy-font: Georgia, "Times New Roman", serif; --figure-font: Arial, Helvetica, sans-serif; }
     * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; background: #FCFCFB; color: var(--ink);
-           font-family: Arial, Helvetica, sans-serif; }
+    body { margin: 0; min-height: 100vh; background: var(--page-bg); color: var(--ink);
+           font-family: var(--copy-font); }
     .shell { min-height: 100vh; max-width: 1500px; margin: 0 auto;
              padding: 30px clamp(20px, 5vw, 76px); }
     .site-header { display:flex; align-items:center; justify-content:space-between;
                    gap:24px; border-bottom:1px solid var(--rule); padding-bottom:19px; }
     .brand { display:flex; gap:14px; align-items:center; color:var(--ink);
-             text-decoration:none; font-size:1.4rem; font-weight:800;
+             text-decoration:none; font-family:var(--figure-font); font-size:1.4rem; font-weight:800;
              letter-spacing:0.22em; }
     .brand-symbol { display:inline-flex; justify-content:center; align-items:center;
                     border:2px solid var(--ink); width:34px; height:34px;
@@ -38,21 +38,21 @@ HOME_HTML = """<!DOCTYPE html>
                    padding:15px 18px; }
     .site-menu a:hover { background:#F4F6F7; }
     .intro { text-align:center; max-width:760px; margin:clamp(65px,13vh,150px) auto 0; }
-    .eyebrow { font-size:.78rem; color:#586971; letter-spacing:.22em;
+    .eyebrow { font-family:var(--figure-font); font-size:.78rem; color:var(--blue); letter-spacing:.22em;
                font-weight:700; text-transform:uppercase; }
-    h1 { margin:16px 0 12px; font-size:clamp(1.5rem, 3vw, 2.5rem);
+    h1 { margin:16px 0 12px; font-family:var(--title-font); color:var(--blue); font-size:clamp(1.5rem, 3vw, 2.5rem);
          line-height:1.23; letter-spacing:-.04em; }
-    .lead { color:#657179; max-width:500px; margin:0 auto 35px;
+    .lead { color:var(--muted); max-width:500px; margin:0 auto 35px;
             font-size:1rem; line-height:1.65; }
     .entry-links { display:flex; align-items:stretch; flex-direction:column;
                    gap:17px; max-width:370px; margin:0 auto; }
     .entry-link { text-decoration:none; padding:22px 28px; background:#fff;
-                  border:1px solid #1D303A; color:var(--ink); font-size:1.2rem;
+                  border:1px solid var(--rule); color:var(--ink); font-family:var(--figure-font); font-size:1.2rem;
                   font-weight:600; letter-spacing:.02em; transition:background .15s; }
-    .entry-link:hover,.entry-link:focus-visible { background:#EDF3F6; outline-offset:3px; }
+    .entry-link:hover,.entry-link:focus-visible { background:#FFFFFF; border-color:var(--blue); outline-offset:3px; }
     .entry-desc { display:block; font-size:.76rem; font-weight:400;
-                  letter-spacing:0; margin-top:8px; color:#69777C; }
-    .foot { padding:50px 0 15px; text-align:center; color:#879196; font-size:.76rem; }
+                  letter-spacing:0; margin-top:8px; color:var(--muted); }
+    .foot { padding:50px 0 15px; text-align:center; color:var(--muted); font-size:.76rem; }
     @media (max-width: 560px) {
       .shell { padding:20px; } .brand { font-size:1.03rem; letter-spacing:.13em; }
       .intro { margin-top:68px; } .entry-link { padding:21px 16px; }
