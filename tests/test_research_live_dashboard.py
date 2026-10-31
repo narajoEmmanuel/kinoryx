@@ -165,7 +165,7 @@ def test_four_explicit_lab_subpages_and_saved_exploration():
     assert stage_from_path("/lab/experimentation") == "experimentation"
     assert stage_from_path("/lab/evaluation") == "evaluation"
     assert stage_from_path("/lab/unknown") == "exploration"
-    assert DEFAULT_WORKSPACE == {"left": ["0"], "right": ["2"]}
+    assert DEFAULT_WORKSPACE == {"left": ["0"], "right": []}
     assert exploration_content(_synthetic()) is not None
     for stage in ("quality", "experimentation", "evaluation"):
         assert other_stage_content(stage) is not None
@@ -196,3 +196,63 @@ def test_raw_workspace_arrangements_preserve_original_points():
         build_workspace_figure(recording, layout, mode="unknown")
     with pytest.raises(ValueError):
         build_workspace_figure(recording, layout, start_seconds=-2)
+
+
+def test_empty_panel_b_never_generates_a_blank_plot():
+    from kinoryx.lab_workspace import build_workspace_figure, DEFAULT_WORKSPACE
+    recording = _synthetic()
+    for arrangement in ("side", "stack", "overlay"):
+        figure = build_workspace_figure(
+            recording, DEFAULT_WORKSPACE, mode=arrangement,
+            start_seconds=0.1, window_seconds=0.25,
+        )
+        assert len(figure.data) == 1
+        assert len(figure.data[0].x) == 500
+        assert not any("Panel B" in annotation.text for annotation in figure.layout.annotations)
+        assert figure.layout.xaxis2 is None
+        assert figure.data[0].line.color is not None
+
+
+def test_all_and_single_channel_views_restore_original_raw_traces():
+    recording = _synthetic()
+    four = make_emg_figure(recording, "all", 0.1, 0.25, "raw")
+    single = make_emg_figure(recording, "1", 0.1, 0.25, "raw")
+    assert len(four.data) == 2
+    assert len(single.data) == 1
+    assert len(single.data[0].x) == 500
+    np.testing.assert_allclose(
+        np.asarray(single.data[0].y, dtype=float),
+        np.asarray(recording.samples[1][200:700], dtype=float),
+    )
+
+
+def test_exploration_has_view_modes_and_conditional_comparison_controls():
+    from kinoryx.research_lab import build_layout, exploration_content
+
+    def flatten(root):
+        yield root
+        children = getattr(root, "children", [])
+        if children is None:
+            return
+        if not isinstance(children, (list, tuple)):
+            children = [children]
+        for child in children:
+            yield from flatten(child)
+
+    layout = exploration_content(_synthetic())
+    nodes = {node.id: node for node in flatten(layout)
+             if getattr(node, "id", None) is not None}
+    assert [item["value"] for item in nodes["lab-view"].options] == [
+        "all", "single", "compare",
+    ]
+    assert nodes["lab-view"].value == "all"
+    assert nodes["lab-single-channel"].value == "0"
+    assert nodes["lab-channel-select-wrap"].style["display"] == "none"
+    assert nodes["lab-compare-controls"].style["display"] == "none"
+    assert nodes["lab-panel-b"].style["display"] == "none"
+    assert nodes["lab-add-b-target"].style["display"] == "none"
+    assert nodes["lab-mode"].value == "side"
+    assert "lab-current-title" in {
+        node.id for node in flatten(build_layout())
+        if getattr(node, "id", None) is not None
+    }
