@@ -25,22 +25,21 @@ Archivo: `EMG2_Squats.mvns`, 291 bytes, SHA-256
 
 ## Ejecución en Cursor
 
-Desde `C:\dev\kinoryx-study`, con los originales en `data_local\`:
+Desde `C:\dev\kinoryx-study`, después de `git pull` (el MVNS ya viene en el repositorio):
 
 ```powershell
-.\.venv\Scripts\python.exe -m kinoryx.cli verify-session data_local
 .\.venv\Scripts\python.exe research\lessons\01_mvns.py
 ```
 
-El primer comando verifica que los tres originales coinciden con los hashes aprobados. El segundo usa Python para mostrar la versión, la etiqueta, el comentario y las dos referencias **leídas del XML local**. No modifica archivos.
+El comando de la lección lee el MVNS original ya descargado con GitHub. El verificador de tres archivos (`verify-session`) queda pendiente hasta que el binario MVN esté disponible. El script no modifica los archivos originales.
 
 Para obtener además un análisis de todas las fuentes:
 
 ```powershell
-.\.venv\Scripts\python.exe research\study_files.py --data-dir data_local --output-dir data_local\study_output
+.\.venv\Scripts\python.exe research\study_files.py --plots
 ```
 
-Abre `data_local/study_output/study_summary.json` y examina el objeto `session_index`.
+Abre `data_local/study_output/study_summary.json` y examina el objeto `session_index`. La entrada correspondiente al MVN puede indicar que falta el binario, sin impedir el análisis de EMG.
 
 ## Preguntas para discutir
 
@@ -52,7 +51,7 @@ Abre `data_local/study_output/study_summary.json` y examina el objeto `session_i
 ## Primeras conclusiones
 
 - El archivo organiza exactamente dos referencias, una `.mvn` y una `.mvne`.
-- Los dos archivos estaban disponibles junto con el índice en el conjunto original inspeccionado.
+- El EMG XML y el índice MVNS están actualmente en GitHub; el archivo binario MVN aún no se transfirió al repositorio.
 - Sus huellas están registradas en `examples/research/EMG2_Squats.manifest.json`.
 - Aún falta interpretar el archivo binario MVN y la sincronización física de las mediciones.
 - El reporte Qualisys se considera **independiente** hasta verificar su relación con esta sesión.
