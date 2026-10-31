@@ -1,0 +1,48 @@
+name: Restore supplied MVN binary on study branch
+on:
+  push:
+    branches:
+      - study/xsens-cometa-qualisys-20261030
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    if: github.event.head_commit.message == 'research(data): stage verified MVN transfer chunks'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Assemble and verify exact source
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+          import hashlib
+
+          folder = Path("research/source_data/mvn_transfer")
+          parts = sorted(folder.glob("part-*.b64"))
+          if len(parts) != 28:
+              raise RuntimeError(f"Expected 28 parts, found {len(parts)}")
+          encoded = "".join("".join(p.read_text(encoding="ascii").split()) for p in parts)
+          data = base64.b64decode(encoded, validate=True)
+          expected_hash = "2881fe6feb8c274bbfcbd50b92ca44d29f8469dad5cb9294af1716b87620692d"
+          digest = hashlib.sha256(data).hexdigest()
+          if len(data) != 4672353 or digest != expected_hash:
+              raise RuntimeError(f"MVN integrity check FAILED (bytes={len(data)}, sha256={digest})")
+          Path("research/source_data/EMG2_Squats.mvn").write_bytes(data)
+          print(f"Binary source verified: {len(data)} bytes, {digest}")
+          PY
+      - name: Commit recovered original, discard transfer fragments and temporary workflow
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f research/source_data/EMG2_Squats.mvn
+          git rm -r research/source_data/mvn_transfer
+          git rm .github/workflows/restore-mvn-study.yml
+          git commit -m "research(data): restore original Xsens MVN binary with SHA-256 verification"
+          git push origin HEAD:study/xsens-cometa-qualisys-20261030
