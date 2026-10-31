@@ -157,6 +157,7 @@ def make_emg_figure(
         showlegend=False,
         hovermode="x",
         font={"family": "Arial, sans-serif", "color": "#34383A", "size": 12},
+        hoverlabel={"font": {"family": "Arial, sans-serif", "size": 12}},
         paper_bgcolor="#fff",
         plot_bgcolor="#fff",
     )
@@ -165,10 +166,11 @@ def make_emg_figure(
     figure.update_yaxes(
         title_text=None, zeroline=True, automargin=True,
         showgrid=True, gridcolor="#edf0f0",
+        tickfont={"size": 11},
     )
     figure.update_xaxes(
         title_text=None, showgrid=True, gridcolor="#edf0f0",
-        automargin=True,
+        automargin=True, tickfont={"size": 11},
     )
     for column in range(1, cols + 1):
         figure.update_xaxes(
