@@ -133,6 +133,7 @@ def build_workspace_figure(
         height=geometry.height,
         margin={"l": 70, "r": 26, "t": 92, "b": 72},
         font={"family": "Arial, sans-serif", "size": 12, "color": "#34383A"},
+        hoverlabel={"font": {"family": "Arial, sans-serif", "size": 12}},
         legend={"orientation": "h", "x": 0, "y": 1.14, "yanchor": "bottom"},
         showlegend=bool(groups),
         hovermode="x",
@@ -141,10 +142,11 @@ def build_workspace_figure(
     )
     figure.update_yaxes(
         title_text=None, automargin=True, zeroline=True,
-        showgrid=True, gridcolor="#E9EDF0",
+        showgrid=True, gridcolor="#E9EDF0", tickfont={"size": 11},
     )
     figure.update_xaxes(
         title_text="Relative time (s)", automargin=True,
         showgrid=True, gridcolor="#E9EDF0",
+        tickfont={"size": 11}, title_font={"size": 11},
     )
     return figure
