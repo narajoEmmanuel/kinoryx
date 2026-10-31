@@ -25,7 +25,7 @@ CHANNEL_COLORS = {
     "3": "#657073",  # existing neutral accent
 }
 
-DEFAULT_WORKSPACE = {"left": ["0"], "right": ["2"]}
+DEFAULT_WORKSPACE = {"left": ["0"], "right": []}
 VALID_MODES = ("side", "stack", "overlay")
 
 
@@ -81,14 +81,20 @@ def build_workspace_figure(
         for ch, values in zip(recording.channels, recording.samples)
     }
     left, right = selected["left"], selected["right"]
-    groups = (
-        [("Overlaid channels", list(dict.fromkeys(left + right)))]
-        if mode == "overlay"
-        else [("Panel A", left), ("Panel B", right)]
-    )
-    cols = 2 if mode == "side" else 1
-    rows = 1 if mode in ("side", "overlay") else 2
-    titles = [label for label, _ in groups]
+    # No vacant comparison chart. Only populated slots create plot panels.
+    nonempty = [
+        (f"Panel {label}", values)
+        for label, values in (("A", left), ("B", right))
+        if values
+    ]
+    if mode == "overlay":
+        combined = list(dict.fromkeys(left + right))
+        groups = [("Raw EMG comparison", combined)] if combined else []
+    else:
+        groups = nonempty
+    cols = 2 if mode == "side" and len(groups) == 2 else 1
+    rows = 1 if cols == 2 else max(1, len(groups))
+    titles = [label for label, _ in groups] or ["Select a channel"]
     geometry = plan_subplot_layout(titles, cols=cols, minimum_height=490,
                                    preferred_panel_height=360)
     figure = make_subplots(
@@ -117,20 +123,18 @@ def build_workspace_figure(
                 ),
                 row=row, col=col,
             )
-        if not channels:
-            figure.add_annotation(
-                text="Drag an EMG channel here",
-                x=0.5, y=0.5, xref=f"x{index + 1 if index else ''} domain",
-                yref=f"y{index + 1 if index else ''} domain",
-                showarrow=False, font={"color": "#7A838C", "size": 13},
-            )
+    if not groups:
+        figure.add_annotation(
+            text="Add a signal to begin", x=0.5, y=0.5,
+            xref="paper", yref="paper", showarrow=False,
+        )
     figure.update_layout(
         template="plotly_white",
         height=geometry.height,
         margin={"l": 70, "r": 26, "t": 92, "b": 72},
-        font={"family": "Arial, sans-serif", "size": 12, "color": "#2E3741"},
+        font={"family": "Arial, sans-serif", "size": 12, "color": "#34383A"},
         legend={"orientation": "h", "x": 0, "y": 1.14, "yanchor": "bottom"},
-        showlegend=True,
+        showlegend=bool(groups),
         hovermode="x",
         paper_bgcolor="#fff",
         plot_bgcolor="#fff",
