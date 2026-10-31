@@ -83,9 +83,16 @@ def test_dashboard_serves_lab_on_same_localhost_server():
     lab_response = client.get("/lab/")
     assert main_response.status_code == 200
     assert lab_response.status_code == 200
-    assert b"Biomechanics Dashboard" in main_response.data
-    assert b"EMG Research Laboratory" in lab_response.data
+    dashboard_response = client.get("/dashboard/")
+    assert dashboard_response.status_code == 200
+    assert b"Choose your workspace" in main_response.data
+    assert b"Laboratory" in main_response.data
+    assert b"Dashboard" in main_response.data
+    assert b"Biomechanics Dashboard" in dashboard_response.data
+    assert b"Laboratory" in lab_response.data
     assert b"Biomechanics Dashboard" not in lab_response.data
+    for stage in ("exploration", "quality", "experimentation", "evaluation"):
+        assert client.get(f"/lab/{stage}").status_code == 200
 
 
 def test_emg_chart_has_one_shared_y_axis_label():
@@ -140,3 +147,52 @@ def test_local_server_enables_hot_reload(monkeypatch):
         "use_reloader": True,
         "dev_tools_hot_reload": True,
     }
+
+
+
+def test_four_explicit_lab_subpages_and_saved_exploration():
+    from kinoryx.research_lab import (
+        STAGES, exploration_content, other_stage_content,
+        stage_from_path,
+    )
+    from kinoryx.lab_workspace import DEFAULT_WORKSPACE
+    assert [slug for slug, _ in STAGES] == [
+        "exploration", "quality", "experimentation", "evaluation"
+    ]
+    assert stage_from_path("/lab/") == "exploration"
+    assert stage_from_path("/lab/exploration") == "exploration"
+    assert stage_from_path("/lab/quality") == "quality"
+    assert stage_from_path("/lab/experimentation") == "experimentation"
+    assert stage_from_path("/lab/evaluation") == "evaluation"
+    assert stage_from_path("/lab/unknown") == "exploration"
+    assert DEFAULT_WORKSPACE == {"left": ["0"], "right": ["2"]}
+    assert exploration_content(_synthetic()) is not None
+    for stage in ("quality", "experimentation", "evaluation"):
+        assert other_stage_content(stage) is not None
+
+
+def test_raw_workspace_arrangements_preserve_original_points():
+    from kinoryx.lab_workspace import build_workspace_figure, canonical_workspace
+    recording = _synthetic()
+    layout = {"left": ["0"], "right": ["1"]}
+    overlay = build_workspace_figure(recording, layout, mode="overlay",
+                                     start_seconds=0.1, window_seconds=0.25)
+    side = build_workspace_figure(recording, layout, mode="side",
+                                  start_seconds=0.1, window_seconds=0.25)
+    stacked = build_workspace_figure(recording, layout, mode="stack",
+                                     start_seconds=0.1, window_seconds=0.25)
+    assert len(overlay.data) == len(side.data) == len(stacked.data) == 2
+    for figure in (overlay, side, stacked):
+        assert all(len(trace.x) == 500 for trace in figure.data)
+        assert "Right" not in " ".join(trace.name for trace in figure.data)
+        np.testing.assert_allclose(
+            np.asarray(figure.data[0].y, dtype=float),
+            np.asarray(recording.samples[0][200:700], dtype=float),
+        )
+    assert overlay.data[0].line.color != overlay.data[1].line.color
+    assert canonical_workspace({"left": ["0", "0", "unknown"], "right": ["1"]},
+                               recording) == {"left": ["0"], "right": ["1"]}
+    with pytest.raises(ValueError):
+        build_workspace_figure(recording, layout, mode="unknown")
+    with pytest.raises(ValueError):
+        build_workspace_figure(recording, layout, start_seconds=-2)
