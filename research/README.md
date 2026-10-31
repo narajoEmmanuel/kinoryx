@@ -35,10 +35,21 @@ El primer comando enseña los atributos y las referencias del índice MVNS. El s
 
 Si tienes una copia local de `EMG2_Squats.mvn`, la puedes colocar manualmente en `research/source_data/` para analizar su huella, pero **no** se requiere para la primera lección ni para las señales EMG. Ten presente que un binario colocado ahí aparecería como archivo nuevo en `git status` y no debe subirse sin revisar sus metadatos.
 
+## Siguiente ejercicio: estudiar la EMG por intervalos
+
+La lección 01 ya se ejecutó correctamente en Cursor el 2026-10-31. La captura MVN sigue ausente, pero eso no impide estudiar las cuatro señales EMG disponibles en GitHub.
+
+```powershell
+.\.venv\Scripts\python.exe research\lessons\02_emg.py
+.\.venv\Scripts\python.exe research\lessons\02_emg.py --channel 0 --start 1 --duration 0.25 --plot
+```
+
+La lección 02 explica RMS, frecuencia de muestreo, ventanas y precauciones al interpretar la magnitud de la señal. La gráfica se guarda únicamente bajo `data_local/study_output/`. Para otras opciones consulta [02_EMG.md](lessons/02_EMG.md).
+
 ## Orden del estudio
 
 1. [MVNS, organización de la sesión](lessons/01_MVNS.md)
-2. MVNE, canales EMG y estadística de señales sin asumir unidades físicas
+2. [MVNE, canales EMG y estadísticas sin asumir unidades físicas](lessons/02_EMG.md)
 3. MVN, analizar formato binario cuando esté disponible; buscar exportación cinemática interpretable
 4. Revisar CSV y JSON derivados de EMG
 5. Reporte Qualisys, métricas y procedencia cuando sean accesibles
