@@ -185,170 +185,464 @@ def make_emg_figure(
     return figure
 
 
-def build_layout() -> html.Main:
-    try:
-        recording = load_source()
-    except (OSError, ValueError) as exc:
-        return html.Main(
+STAGES = (
+    ("exploration", "Exploratory Analysis"),
+    ("quality", "Signal Quality Assessment"),
+    ("experimentation", "Signal Processing Experiments"),
+    ("evaluation", "Evaluation & Reporting"),
+)
+GITHUB_ROOT = (
+    "https://github.com/narajoEmmanuel/kinoryx/blob/"
+    "study/xsens-cometa-qualisys-20261030/"
+)
+
+
+def stage_from_path(pathname: str | None) -> str:
+    """Resolve only the four explicitly supported laboratory pages."""
+    parts = (pathname or "/lab/").strip("/").split("/")
+    candidate = parts[1] if len(parts) == 2 and parts[0] == "lab" else "exploration"
+    return candidate if candidate in {stage[0] for stage in STAGES} else "exploration"
+
+
+def stage_navigation(active: str):
+    return [
+        dcc.Link(
             [
-                html.H1("KINORYX | EMG Research Laboratory"),
-                html.P(f"Research data unavailable: {exc}"),
-                html.A("Return to dashboard", href="/"),
+                html.Span(f"{idx:02d}", className="lab-stage-index"),
+                html.Span(title, className="lab-stage-title"),
             ],
-            className="app-shell lab-shell",
+            href=f"/lab/{slug}",
+            className="lab-stage-link" + (" is-active" if slug == active else ""),
         )
-    channel_options = [{"label": "All four EMG channels", "value": "all"}]
-    channel_options.extend(
-        {"label": f"{ch.id} | {academic_channel_name(ch.name)}", "value": str(ch.id)}
-        for ch in recording.channels
-    )
-    return html.Main(
+        for idx, (slug, title) in enumerate(STAGES, start=1)
+    ]
+
+
+def recording_palette(rec: EmgRecording):
+    from kinoryx.lab_workspace import CHANNEL_COLORS, academic_channel_name
+
+    return [
+        html.Div(
+            [
+                html.Div(
+                    [
+                        html.Span(className="lab-color-dot",
+                                  style={"backgroundColor": CHANNEL_COLORS.get(str(ch.id), "#4C6576")}),
+                        html.Strong(academic_channel_name(ch.name)),
+                    ], className="lab-source-heading",
+                ),
+                html.Div(
+                    [
+                        html.Button("Add to A", type="button",
+                                    className="lab-add-button",
+                                    **{"data-channel": str(ch.id), "data-slot": "left"}),
+                        html.Button("Add to B", type="button",
+                                    className="lab-add-button",
+                                    **{"data-channel": str(ch.id), "data-slot": "right"}),
+                    ], className="lab-add-actions",
+                ),
+            ],
+            className="emg-palette-item",
+            draggable="true",
+            title=f"Drag {academic_channel_name(ch.name)} into Panel A or Panel B",
+            **{"data-channel": str(ch.id)},
+        )
+        for ch in rec.channels
+    ]
+
+
+def workspace_slot(slot: str, label: str):
+    return html.Div(
         [
-            html.Header(
+            html.Div(
                 [
-                    html.A("← Back to gait dashboard", href="/", className="lab-back"),
-                    html.Div("KINORYX / RESEARCH ONLY", className="brand-kicker"),
-                    html.H1("EMG Research Laboratory", className="page-title"),
+                    html.Strong(label),
+                    html.Span("Drop channels here, or move them between panels"),
+                ], className="lab-drop-heading",
+            ),
+            html.Div(id=f"lab-{slot}-chips", className="lab-chip-list"),
+        ],
+        className="emg-dropzone",
+        **{"data-slot": slot},
+    )
+
+
+def exploration_content(rec: EmgRecording):
+    return html.Div(
+        [
+            html.Div(
+                [
+                    html.Div("CURRENT STAGE / 01", className="lab-kicker"),
+                    html.H2("Exploratory Analysis", className="lab-stage-heading"),
                     html.P(
-                        "Interactive visualization of the original Cometa EMG recording. "
-                        "Inspect the unprocessed signal before evaluating any transformation.",
-                        className="page-subtitle",
-                    ),
-                    html.P(
-                        "Research only · Localhost · Source files remain unchanged · "
-                        "Not merged into main",
-                        className="lab-caution",
+                        "Inspect unprocessed EMG before performing any filtering or "
+                        "making physiological claims. Arrange signals for direct visual comparison.",
+                        className="lab-stage-description",
                     ),
                 ],
-                className="hero-panel",
+                className="lab-stage-intro",
             ),
-            html.Section(
+            html.Div(
                 [
-                    html.Div(
+                    html.A(
+                        "Experiment 01: First burst, 1.0 to 2.0 s",
+                        href=GITHUB_ROOT + "research/experiments/01_first_burst_raw.md",
+                        target="_blank", rel="noopener noreferrer",
+                    ),
+                    html.Span("Source evidence and descriptive measurements saved in GitHub"),
+                ],
+                className="lab-progress-strip",
+            ),
+            html.Div(
+                [
+                    html.Aside(
                         [
-                            html.H2("Recording", className="section-title"),
-                            html.P(SOURCE.name, className="lab-source"),
+                            html.H3("Signal library", className="lab-section-title"),
+                            html.P(
+                                "Drag a channel into Panel A or B. Use Add buttons "
+                                "for keyboard and touch-friendly placement.",
+                                className="lab-muted",
+                            ),
+                            html.Div(recording_palette(rec), className="lab-source-list"),
                             html.Div(
                                 [
-                                    html.Div([html.Small("Channels"), html.Strong(str(len(recording.channels)))]),
-                                    html.Div([html.Small("Sampling rate"), html.Strong(f"{recording.sampling_hz:g} Hz")]),
-                                    html.Div([html.Small("Samples per channel"), html.Strong(f"{recording.sample_count:,}")]),
-                                    html.Div([html.Small("Recording span"), html.Strong(f"{recording.sample_span_s:.3f} s")]),
-                                ], className="lab-metrics",
-                            ),
-                            html.P(
-                                "Muscle labels are taken from the source XML; "
-                                "amplitude units, calibration and synchronization are unverified.",
-                                className="lab-help",
+                                    html.Div("SOURCE RECORDING", className="lab-kicker"),
+                                    html.P(SOURCE.name, className="lab-filename"),
+                                    html.P(
+                                        f"{len(rec.channels)} channels · "
+                                        f"{rec.sampling_hz:g} Hz · "
+                                        f"{rec.sample_span_s:.3f} s",
+                                        className="lab-muted",
+                                    ),
+                                    html.P(
+                                        "Recorded amplitude units are not established. "
+                                        "No synchronization has been verified.",
+                                        className="lab-muted",
+                                    ),
+                                ],
+                                className="lab-recording-info",
                             ),
                         ],
-                        className="lab-source-pane",
+                        className="lab-sidebar",
                     ),
-                    html.Div(
+                    html.Section(
                         [
-                            html.H2("Signal explorer", className="section-title"),
-                            html.Label("EMG channel", htmlFor="lab-channel", className="control-label"),
-                            dcc.Dropdown(
-                                id="lab-channel", options=channel_options, value="all",
-                                clearable=False,
+                            html.Div(
+                                [
+                                    html.H3("Signal workspace", className="lab-section-title"),
+                                    html.Button(
+                                        "Reset workspace",
+                                        className="lab-workspace-reset",
+                                        type="button",
+                                    ),
+                                ], className="lab-workspace-heading",
                             ),
-                            html.Label("Window start (s)", htmlFor="lab-start", className="control-label"),
-                            dcc.Slider(
-                                id="lab-start", min=0, max=8, step=0.1, value=0,
-                                marks={0: "0", 2: "2", 4: "4", 6: "6", 8: "8"},
-                                tooltip={"placement": "bottom", "always_visible": False},
-                            ),
-                            html.Label("Window duration", htmlFor="lab-window", className="control-label"),
-                            dcc.RadioItems(
-                                id="lab-window",
-                                options=[
-                                    {"label": "0.25 s", "value": 0.25},
-                                    {"label": "1 s", "value": 1.0},
-                                    {"label": "2 s", "value": 2.0},
-                                    {"label": "Full recording", "value": 8.3},
+                            html.Div(
+                                [
+                                    workspace_slot("left", "Panel A"),
+                                    workspace_slot("right", "Panel B"),
                                 ],
-                                value=8.3, inline=True,
-                                className="lab-inline",
+                                className="lab-drop-grid",
                             ),
-                            html.Label("Signal view", htmlFor="lab-transform", className="control-label"),
-                            dcc.RadioItems(
-                                id="lab-transform",
-                                options=[
-                                    {"label": "Raw EMG", "value": "raw"},
-                                    {"label": "Compare band-pass, 20 to 450 Hz", "value": "bandpass"},
-                                    {"label": "Compare RMS, 250 ms window", "value": "rms"},
+                            html.Div(
+                                [
+                                    html.Div(
+                                        [
+                                            html.Label("Arrangement", className="control-label"),
+                                            dcc.RadioItems(
+                                                id="lab-mode",
+                                                options=[
+                                                    {"label": "Side by side", "value": "side"},
+                                                    {"label": "Stacked", "value": "stack"},
+                                                    {"label": "Overlay", "value": "overlay"},
+                                                ],
+                                                value="side",
+                                                inline=True,
+                                                className="lab-choice-list",
+                                            ),
+                                        ],
+                                        className="lab-control-block",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label("Window duration", className="control-label"),
+                                            dcc.RadioItems(
+                                                id="lab-window",
+                                                options=[
+                                                    {"label": "0.25 s", "value": 0.25},
+                                                    {"label": "1 s", "value": 1.0},
+                                                    {"label": "2 s", "value": 2.0},
+                                                    {"label": "Full", "value": 8.3},
+                                                ],
+                                                value=1.0,
+                                                inline=True,
+                                                className="lab-choice-list",
+                                            ),
+                                        ],
+                                        className="lab-control-block",
+                                    ),
                                 ],
-                                value="raw", className="lab-inline",
+                                className="lab-options-grid",
+                            ),
+                            html.Div(
+                                [
+                                    html.Label("Window start (s)", className="control-label"),
+                                    dcc.Slider(
+                                        id="lab-start", min=0, max=8, step=0.1, value=1.0,
+                                        marks={0: "0", 2: "2", 4: "4", 6: "6", 8: "8"},
+                                        tooltip={"placement": "bottom"},
+                                    ),
+                                ],
+                                className="lab-time-control",
+                            ),
+                            html.Div(id="lab-workspace-note", className="lab-status", role="status"),
+                            dcc.Loading(
+                                dcc.Graph(
+                                    id="lab-comparison-graph",
+                                    config=CONFIG,
+                                    className="lab-comparison-graph",
+                                ),
+                                type="circle",
                             ),
                             html.P(
-                                "Signal processing previews are exploratory and not validated "
-                                "for this recording. The unprocessed signal is always displayed "
-                                "alongside any transformed preview.",
-                                className="lab-help",
+                                "Raw EMG only. Overlay uses the same original numeric scale; "
+                                "panel autoscaling and electrode conditions can affect visual comparisons. "
+                                "No force, normalized activation or validated event timing is inferred.",
+                                className="lab-muted",
                             ),
                         ],
-                        className="lab-controls-pane",
+                        className="lab-workspace-main",
                     ),
                 ],
-                className="lab-top-grid",
+                className="lab-exploration-grid",
             ),
-            html.Section(
+        ],
+        className="lab-stage-body",
+    )
+
+
+STAGE_CONTENT = {
+    "quality": (
+        "Signal Quality Assessment",
+        "Evaluate the integrity of each recording and identify potential noise, "
+        "motion artifacts, interference, baseline shifts and clipping before applying filters.",
+        "Not yet assessed",
+        (
+            "Inspect short raw windows for isolated transients and baseline drift.",
+            "Review spectral characteristics and acquisition metadata.",
+            "Document limitations before changing signal-processing parameters.",
+        ),
+    ),
+    "experimentation": (
+        "Signal Processing Experiments",
+        "Compare proposed processing methods to the original signal using explicit "
+        "parameters and reproducible experiments.",
+        "Planned, not validated",
+        (
+            "Compare a band-pass preview with the original signal.",
+            "Study rectification, RMS and envelope windows separately.",
+            "Evaluate sensitivity to assumptions and edge effects.",
+        ),
+    ),
+    "evaluation": (
+        "Evaluation & Reporting",
+        "Review recorded evidence, validate interpretations and decide what can "
+        "be responsibly incorporated into future KINORYX functionality.",
+        "Planned, no conclusions approved",
+        (
+            "Summarize findings, figures, method settings and uncertainties.",
+            "Review reproducibility and calibration requirements.",
+            "Record accepted and rejected proposals in the decision log.",
+        ),
+    ),
+}
+
+
+def other_stage_content(stage: str):
+    title, description, status, tasks = STAGE_CONTENT[stage]
+    next_docs = {
+        "quality": "research/STUDY_LOG.md",
+        "experimentation": "research/lessons/02_EMG.md",
+        "evaluation": "research/DECISION_LOG.md",
+    }
+    return html.Section(
+        [
+            html.Div(f"RESEARCH STAGE / {1 + [key for key, _ in STAGES].index(stage):02d}",
+                     className="lab-kicker"),
+            html.H2(title, className="lab-stage-heading"),
+            html.P(description, className="lab-stage-description"),
+            html.Div(
                 [
-                    html.H2("EMG signals and exploratory comparisons", className="section-title"),
-                    html.Div(id="lab-status", className="status-banner", role="status"),
-                    dcc.Loading(
-                        dcc.Graph(id="lab-figure", config=CONFIG, className="lab-figure"),
-                        type="circle",
-                    ),
-                    html.P(
-                        "Time is relative to the first sample. EMG amplitudes have no confirmed "
-                        "physical unit or normalization reference. These comparisons do not "
-                        "establish muscle force, activation levels or a clinical diagnosis.",
-                        className="lab-help",
-                    ),
-                ], className="lab-plot-section",
+                    html.Span("Current progress", className="lab-muted"),
+                    html.Strong(status),
+                ], className="lab-progress-strip",
             ),
+            html.H3("Research checklist", className="lab-section-title"),
+            html.Ol([html.Li(item) for item in tasks], className="lab-research-checklist"),
+            html.A(
+                "Open research notes and methodology",
+                href=GITHUB_ROOT + next_docs[stage],
+                target="_blank", rel="noopener noreferrer",
+                className="lab-document-link",
+            ),
+            html.P(
+                "This page is deliberately reserved for stage-specific results. "
+                "Unverified analysis is not presented as a completed finding.",
+                className="lab-muted",
+            ),
+        ],
+        className="lab-stage-body lab-planned-stage",
+    )
+
+
+def build_layout() -> html.Main:
+    return html.Main(
+        [
+            dcc.Location(id="lab-location", refresh=False),
+            dcc.Store(
+                id="lab-workspace",
+                storage_type="session",
+                data={"left": ["0"], "right": ["2"]},
+            ),
+            html.Div(id="lab-workspace-hook", style={"display": "none"}),
+            html.Header(
+                [
+                    html.Div(
+                        [
+                            html.A("KINORYX", href="/", className="lab-brand"),
+                            html.Span("/", className="lab-breadcrumb-separator"),
+                            html.Span("Laboratory", className="lab-breadcrumb"),
+                        ], className="lab-header-brand",
+                    ),
+                    html.Nav(
+                        [
+                            html.A("Home", href="/"),
+                            html.A("Dashboard", href="/dashboard/"),
+                        ], className="lab-top-links",
+                    ),
+                ], className="lab-product-header",
+            ),
+            html.Div(
+                [
+                    html.H1("Laboratory", className="lab-page-title"),
+                    html.P(
+                        "A structured workflow for scientific signal research.",
+                        className="lab-page-description",
+                    ),
+                ], className="lab-page-heading",
+            ),
+            html.Nav(id="lab-stage-nav", className="lab-stage-nav",
+                     aria_label="Laboratory research stages"),
+            html.Div(id="lab-stage-content"),
             html.Footer(
-                [
-                    html.P(
-                        "Experimental workspace for assessing methods and validating evidence "
-                        "before changing the production application."
-                    ),
-                ], className="page-footer",
+                "KINORYX Research Laboratory · Experimental branch · "
+                "Source recordings preserved",
+                className="lab-footer",
             ),
-        ], className="app-shell lab-shell",
+        ],
+        className="app-shell kinoryx-laboratory",
     )
 
 
 def mount_research_lab(flask_server) -> Dash:
-    """Share the existing localhost server, without replacing the gait dashboard."""
+    """Create one permanent /lab/ Dash application with four URL-based stages."""
+    from kinoryx.lab_workspace import (
+        DEFAULT_WORKSPACE, CHANNEL_COLORS, academic_channel_name,
+        build_workspace_figure, canonical_workspace,
+    )
+
     lab = Dash(
         "kinoryx.research_lab",
         server=flask_server,
         url_base_pathname="/lab/",
         assets_folder=str(ASSETS),
-        title="KINORYX | EMG Research Laboratory",
+        title="KINORYX | Laboratory",
         suppress_callback_exceptions=True,
     )
     lab.layout = build_layout()
 
     @lab.callback(
-        Output("lab-figure", "figure"),
-        Output("lab-status", "children"),
-        Input("lab-channel", "value"),
+        Output("lab-stage-nav", "children"),
+        Output("lab-stage-content", "children"),
+        Input("lab-location", "pathname"),
+    )
+    def render_stage(pathname):
+        stage = stage_from_path(pathname)
+        navigation = stage_navigation(stage)
+        if stage != "exploration":
+            return navigation, other_stage_content(stage)
+        try:
+            return navigation, exploration_content(load_source())
+        except (ValueError, OSError) as exc:
+            return navigation, html.P(
+                f"Original recording unavailable: {exc}",
+                className="lab-error",
+            )
+
+    @lab.callback(
+        Output("lab-left-chips", "children"),
+        Output("lab-right-chips", "children"),
+        Output("lab-comparison-graph", "figure"),
+        Output("lab-workspace-note", "children"),
+        Input("lab-workspace", "data"),
+        Input("lab-mode", "value"),
         Input("lab-start", "value"),
         Input("lab-window", "value"),
-        Input("lab-transform", "value"),
     )
-    def refresh(channel: str, start: float, window: float, mode: str):
-        try:
-            recording = load_source()
-            figure = make_emg_figure(recording, channel, start, window, mode)
-            label = "Raw, unprocessed EMG" if mode == "raw" else (
-                f"Raw EMG compared with {comparison_label(mode)} (exploratory)"
-            )
-            return figure, f"{label}. Original recording preserved."
-        except (ValueError, OSError) as exc:
-            return go.Figure(), f"Unable to display requested view: {exc}"
+    def refresh_workspace(state, mode, start, duration):
+        rec = load_source()
+        current = canonical_workspace(state, rec)
 
+        def chips(slot):
+            result = []
+            for channel in current[slot]:
+                original = next(ch for ch in rec.channels if str(ch.id) == channel)
+                result.append(
+                    html.Div(
+                        [
+                            html.Span(
+                                academic_channel_name(original.name),
+                                className="lab-chip-name",
+                            ),
+                            html.Button(
+                                "×", type="button",
+                                title="Remove channel",
+                                className="emg-remove-item",
+                                **{"data-channel": channel, "data-slot": slot},
+                            ),
+                        ],
+                        className="emg-active-item",
+                        draggable="true",
+                        style={"borderLeftColor": CHANNEL_COLORS.get(channel, "#445")},
+                        **{"data-channel": channel, "data-from-slot": slot},
+                    )
+                )
+            return result
+
+        try:
+            figure = build_workspace_figure(
+                rec, current, mode=mode, start_seconds=float(start),
+                window_seconds=float(duration),
+            )
+            status = (
+                f"{len(current['left']) + len(current['right'])} placements · "
+                f"{mode.replace('side', 'side by side').title()} · "
+                "Unprocessed channels, original scale"
+            )
+            return chips("left"), chips("right"), figure, status
+        except (TypeError, ValueError) as exc:
+            return chips("left"), chips("right"), go.Figure(), (
+                f"Unable to display this workspace: {exc}"
+            )
+
+    lab.clientside_callback(
+        """
+        function(data) {
+            window.__kinoryxWorkspaceState = data || {left: ["0"], right: ["2"]};
+            return window.dash_clientside.no_update;
+        }
+        """,
+        Output("lab-workspace-hook", "children"),
+        Input("lab-workspace", "data"),
+    )
     return lab
