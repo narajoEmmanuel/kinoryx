@@ -531,7 +531,7 @@ def build_layout() -> html.Main:
         [
             dcc.Location(id="lab-location", refresh=False),
             dcc.Store(
-                id="lab-workspace", storage_type="session",
+                id="lab-workspace-v2", storage_type="session",
                 data={"left": ["0"], "right": []},
             ),
             html.Div(id="lab-workspace-hook", style={"display": "none"}),
@@ -605,7 +605,7 @@ def mount_research_lab(flask_server) -> Dash:
         Output("lab-add-b-target", "style"),
         Output("lab-channel-select-wrap", "style"),
         Output("lab-arrangement-wrap", "style"),
-        Input("lab-workspace", "data"),
+        Input("lab-workspace-v2", "data"),
         Input("lab-mode", "value"),
         Input("lab-start", "value"),
         Input("lab-window", "value"),
@@ -683,6 +683,6 @@ def mount_research_lab(flask_server) -> Dash:
         }
         """,
         Output("lab-workspace-hook", "children"),
-        Input("lab-workspace", "data"),
+        Input("lab-workspace-v2", "data"),
     )
     return lab
