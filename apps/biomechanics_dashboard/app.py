@@ -270,6 +270,11 @@ def create_app() -> Dash:
                         "Explore movement signals. Export figures for research.",
                         className="page-subtitle",
                     ),
+                    html.A(
+                        "Abrir laboratorio EMG experimental",
+                        href="/lab/",
+                        className="lab-nav-link",
+                    ),
                 ],
                 className="hero-panel",
             ),
@@ -461,6 +466,11 @@ def create_app() -> Dash:
             fallback_metrics = [metric_card("Status", "Rejected", message)]
             return empty, message, fallback_metrics, html.Div(), html.Div(), html.Div()
 
+    # This dashboard and the optional EMG laboratory share one local Flask server.
+    # These research-only files exist only in the non-merge study branch.
+    from kinoryx.research_lab import mount_research_lab
+
+    mount_research_lab(app.server)
     return app
 
 
