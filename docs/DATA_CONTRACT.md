@@ -20,3 +20,11 @@ The excerpt is illustrative and too short for actual filtering. Use `kinoryx dem
 - These demo columns do not encode independent initial contact/toe-off ground truth.
 
 Real Xsens MVNX or vendor CSV files should not be imported until exact schemas, sensor positioning, versions, units and coordinate frames are known.
+
+## Local external EMG contract (research-only)
+
+The independent `.mvne` XML reader in `kinoryx.io.xsens_emg` supports numeric scalar channels declared in the MVN external-channel XML header. It verifies declared channel count, channel IDs, sampling rates, finite values and equal sample counts. No proprietary binary `.mvn` parser is included.
+
+The optional local export produces `time_s` as channel-local sample index divided by header sampling frequency, and one unscaled `emg_ch<ID>_raw` column per channel. A sidecar JSON records channel/source labels, the exact source SHA-256, reported sample rate, sample count and unresolved units/synchronization status.
+
+These raw channels are **not** gyroscope columns and cannot be passed to the gait-event `inspect`/`explore` commands as though they were validated gait signals. No raw EMG unit, electrode placement, gain, filtering or absolute cross-system synchronization is inferred. See [Research sources](RESEARCH_SOURCES.md).
