@@ -256,3 +256,78 @@ def test_exploration_has_view_modes_and_conditional_comparison_controls():
         node.id for node in flatten(build_layout())
         if getattr(node, "id", None) is not None
     }
+
+
+def test_official_blue_stage_navigation_and_kinoryx_only_footers():
+    from kinoryx.research_lab import build_layout, stage_navigation
+    from kinoryx.landing import HOME_HTML
+
+    for stage in ("exploration", "quality", "experimentation", "evaluation"):
+        tabs = stage_navigation(stage)
+        assert len(tabs) == 4
+        assert sum("is-active" in tab.className for tab in tabs) == 1
+        assert "is-active" in tabs[
+            ["exploration", "quality", "experimentation", "evaluation"].index(stage)
+        ].className
+
+    lab = build_layout()
+    footer = [child for child in lab.children if getattr(child, "_type", None) == "Footer"]
+    assert len(footer) == 1
+    assert footer[0].children == "KINORYX"
+    assert footer[0].className == "kinoryx-bottom-bar"
+    assert '<footer class="foot">KINORYX</footer>' in HOME_HTML
+
+    app_file = Path(__file__).resolve().parents[1] / "apps/biomechanics_dashboard/app.py"
+    spec = importlib.util.spec_from_file_location("kinoryx_footer_test_app", app_file)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    dashboard = module.create_app()
+    footers = [child for child in dashboard.layout.children
+               if getattr(child, "_type", None) == "Footer"]
+    assert len(footers) == 1
+    assert footers[0].children == "KINORYX"
+
+
+def test_plot_fonts_have_minimum_10_pixels():
+    from kinoryx.lab_workspace import build_workspace_figure
+
+    recording = _synthetic()
+    figures = (
+        make_emg_figure(recording, "all", 0.1, 0.25, "raw"),
+        build_workspace_figure(
+            recording, {"left": ["0"], "right": ["1"]},
+            mode="overlay", start_seconds=0.1, window_seconds=0.25,
+        ),
+    )
+    for figure in figures:
+        assert figure.layout.font.size >= 10
+        assert figure.layout.hoverlabel.font.size >= 10
+        for axis in figure.select_xaxes():
+            assert axis.tickfont.size >= 10
+        for axis in figure.select_yaxes():
+            assert axis.tickfont.size >= 10
+        for annotation in figure.layout.annotations:
+            if annotation.font is not None and annotation.font.size is not None:
+                assert annotation.font.size >= 10
+
+
+def test_css_keeps_text_above_12_px_and_original_typography():
+    import re
+    root = Path(__file__).resolve().parents[1]
+    css_files = [
+        root / "apps/biomechanics_dashboard/assets/workspace.css",
+        root / "apps/biomechanics_dashboard/assets/research-lab.css",
+        root / "apps/biomechanics_dashboard/assets/lab-restructure.css",
+    ]
+    for path in css_files:
+        content = path.read_text(encoding="utf-8")
+        for declaration in re.findall(r"\\bfont(?:-size)?\\s*:\\s*[^;{}]+", content):
+            for size in re.findall(r"(?<![\\w.])(\\d*\\.\\d+)rem\\b", declaration):
+                assert float(size) >= 0.75, (path.name, declaration)
+    theme = css_files[0].read_text(encoding="utf-8")
+    lab_css = css_files[2].read_text(encoding="utf-8")
+    assert "--heading-blue: #0847A6" in theme
+    assert "background: var(--heading-blue)" in lab_css
+    assert "border-radius: 19px 19px 0 0" in lab_css
+    assert "font-family: var(--title-font)" in lab_css
