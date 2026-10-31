@@ -41,3 +41,12 @@ Fecha de apertura: 2026-10-30. Rama: `study/xsens-cometa-qualisys-20261030`.
 **Qualisys:** inspección directa de la página `Test results` del reporte GaitCAST Full body (Visual3D). Informe detallado [REPORT_AUDIT_2026-10-31.md](qualisys/REPORT_AUDIT_2026-10-31.md). Se identifican siete grupos de análisis, tres ensayos visibles, EMG bilateral tibial anterior, panel video/3D, referencias y opciones de PDF. La página `Findings` se inspeccionó posteriormente: encabezado `Impairments` y texto `There are no impairments to display yet.`. No equivale a demostrar ausencia de alteraciones. Las interacciones y los datos internos de curvas permanecen fuera del alcance verificado. **No existe prueba de que Qualisys corresponda a la misma sesión Xsens/Cometa.**
 
 **Decisión de orden:** se completó el estudio documental de las dos vistas del reporte Qualisys y se cerró el informe independiente el 2026-10-31. No se inició la siguiente lección de señales durante este cierre; cualquier estudio EMG posterior debe mantenerse separado de Qualisys.
+
+
+### Etapa 01, primeras capturas del visualizador (2026-10-31)
+
+**Observación proporcionada por el usuario:** capturas de pantalla de los cuatro canales Cometa sin procesar, mostrados como dos pares, derecho e izquierdo. Las capturas evidenciaron un problema de interfaz: las etiquetas Y idénticas de cada panel se superponían visualmente. La rama experimental se ajustó para usar una sola leyenda global de amplitud, títulos adaptativos y textos académicos en inglés, incluidos dashboard de marcha y laboratorio EMG.
+
+**Notas visuales preliminares, no cuantificadas:** en ambos canales *rectus femoris* parecen existir ráfagas de amplitud más alta aproximadamente entre 1.2 y 1.8 s, 3.5 y 4.2 s, y 6.0 y 6.6 s. Los canales *biceps femoris* muestran un patrón distinto, con picos aislados que todavía no se han clasificado. No se ha demostrado todavía si esos segmentos representan actividad fisiológica, artefactos o su coincidencia temporal con eventos cinemáticos. **No** inferir simetría, fuerza, activación normalizada ni tipo de ejercicio a partir de capturas.
+
+**Decisión:** no modificar los originales ni avanzar aún a comparaciones filtradas; primero comprobar legibilidad y reproducibilidad de las gráficas originales con los nuevos títulos.
