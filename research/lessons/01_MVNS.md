@@ -31,7 +31,14 @@ Desde `C:\dev\kinoryx-study`, después de `git pull` (el MVNS ya viene en el rep
 .\.venv\Scripts\python.exe research\lessons\01_mvns.py
 ```
 
-El comando de la lección lee el MVNS original ya descargado con GitHub. El verificador de tres archivos (`verify-session`) queda pendiente hasta que el binario MVN esté disponible. El script no modifica los archivos originales.
+El comando de la lección lee el MVNS original ya descargado con GitHub.
+
+Para verificar las tres fuentes originales:
+
+```powershell
+.\.venv\Scripts\python.exe -m kinoryx.cli verify-session research/source_data
+```
+ Los tres archivos originales, incluido el binario MVN, ya están presentes; el verificador puede ejecutarse con `research/source_data`. El script no modifica los archivos originales.
 
 Para obtener además un análisis de todas las fuentes:
 
@@ -39,7 +46,7 @@ Para obtener además un análisis de todas las fuentes:
 .\.venv\Scripts\python.exe research\study_files.py --plots
 ```
 
-Abre `data_local/study_output/study_summary.json` y examina el objeto `session_index`. La entrada correspondiente al MVN puede indicar que falta el binario, sin impedir el análisis de EMG.
+Abre `data_local/study_output/study_summary.json` y examina el objeto `session_index`. El resumen ya debe identificar el MVN como presente, junto con su huella y 32 primeros bytes, **sin decodificar el movimiento**.
 
 ## Preguntas para discutir
 
@@ -51,7 +58,7 @@ Abre `data_local/study_output/study_summary.json` y examina el objeto `session_i
 ## Primeras conclusiones
 
 - El archivo organiza exactamente dos referencias, una `.mvn` y una `.mvne`.
-- El EMG XML y el índice MVNS están actualmente en GitHub; el archivo binario MVN aún no se transfirió al repositorio.
+- Los tres originales (MVNS, MVNE y MVN) ya están preservados en GitHub, con huellas SHA-256 registradas.
 - Sus huellas están registradas en `examples/research/EMG2_Squats.manifest.json`.
 - Aún falta interpretar el archivo binario MVN y la sincronización física de las mediciones.
 - El reporte Qualisys se considera **independiente** hasta verificar su relación con esta sesión.
