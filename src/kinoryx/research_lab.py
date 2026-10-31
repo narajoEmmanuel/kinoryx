@@ -278,7 +278,7 @@ def build_layout() -> html.Main:
 def mount_research_lab(flask_server) -> Dash:
     """Share the existing localhost server, without replacing the gait dashboard."""
     lab = Dash(
-        "kinoryx_emg_research",
+        "kinoryx.research_lab",
         server=flask_server,
         url_base_pathname="/lab/",
         assets_folder=str(ASSETS),
