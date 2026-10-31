@@ -19,6 +19,14 @@ Abre en el navegador:
 
 Hay un enlace a la vista de EMG en el encabezado del dashboard original, y un enlace de retorno dentro del laboratorio. Si el puerto 8050 ya está ocupado por un servidor anterior, detenlo con Ctrl+C en aquella terminal antes de iniciarlo.
 
+## Regla visual, corrección solicitada por el usuario
+
+**2026-10-31:** la variante inicial del rediseño tenía exceso de bloques de texto e introdujo colores y tipografías no autorizados. Se corrigió la página \`Exploratory Analysis\` para recuperar la jerarquía anterior: título original de KINORYX, resumen \`Recording\` y controles \`View\` en una franja superior, biblioteca compacta de señales y **gráficas a ancho completo**. La navegación de cuatro etapas y las capacidades de arrastrar, comparar lado a lado, apilar o superponer siguen activas.
+
+**Norma para cambios posteriores:** no alterar la paleta, las familias tipográficas ni la jerarquía visual establecidas en \`apps/biomechanics_dashboard/assets/workspace.css\` sin aprobación expresa. Los nuevos estilos deben reutilizar \`--page-bg\`, \`--ink\`, \`--muted\`, \`--panel-border\`, \`--left\`, \`--right\`, \`--accent\`, \`--heading-blue\`, \`--title-font\`, \`--figure-font\` y \`--copy-font\`. Las cuatro trazas reutilizan exclusivamente colores ya existentes en ese sistema, sin inventar una paleta nueva.
+
+Reducir el texto en pantalla: dejar los detalles científicos en \`research/laboratory/\` y \`research/experiments/\`, con enlaces discretos desde la interfaz. Nunca ocultar las cuatro etapas ni eliminar los canales originales; el análisis exploratorio continúa mostrando únicamente datos crudos.
+
 ## Navegación del sistema, primer ajuste de arquitectura
 
 A partir de esta revisión, KINORYX utiliza tres rutas en el servidor local:
