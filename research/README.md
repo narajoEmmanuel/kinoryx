@@ -13,13 +13,11 @@ No repitas `git worktree add`, ni reinstales Python. Tu entorno `.venv` con Pyth
 
 ## Qué se descarga de GitHub
 
-Los originales `research/source_data/EMG2_Squats.mvns` y `research/source_data/EMG2_Squats-200714130240.mvne` ahora están **guardados directamente en la rama**, preservando exactamente sus bytes originales. Por tanto, no es necesario ningún ZIP para estudiar el índice MVNS y el EMG. Su integridad se verifica en `tests/test_research_committed_sources.py`.
-
-El archivo binario `EMG2_Squats.mvn` **todavía no está guardado en GitHub**, debido a una limitación de transferencia binaria del conector disponible. La metadata y su SHA-256 se conservan en [el manifiesto](../examples/research/EMG2_Squats.manifest.json). No se ha decodificado su movimiento ni confirmado sincronización.
+Los **tres originales** `.mvns`, `.mvne` y `.mvn` están guardados íntegros en [research/source_data](source_data/README.md). El binario MVN se transfirió con una restauración verificada por SHA-256, sin intervención de tu PC. No se necesita ningún ZIP.
 
 El reporte web de Qualisys está documentado en [research/qualisys](qualisys/README.md) y se puede abrir con [open_report.html](qualisys/open_report.html). Es un **enlace al sitio original**, no una copia offline de su contenido interactivo.
 
-**Atención:** el repositorio de Kinoryx es público; los originales MVNS y MVNE que se subieron a esta rama pueden verse públicamente. Los datos EMG no adquieren licencia MIT por estar presentes en el repositorio.
+**Atención:** el repositorio de Kinoryx es público; los tres originales que se subieron a esta rama pueden verse públicamente. Los datos EMG no adquieren licencia MIT por estar presentes en el repositorio.
 
 ## Ejecutar el primer estudio en Cursor
 
@@ -31,9 +29,19 @@ En la terminal de `C:\dev\kinoryx-study`:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-El primer comando enseña los atributos y las referencias del índice MVNS. El segundo analiza los 4 canales EMG desde el XML original, guarda un resumen JSON en `data_local/study_output/study_summary.json` y genera ocho gráficas en esa carpeta ignorada por Git. La falta del binario MVN se anota como pendiente, sin bloquear la exploración del EMG.
+El primer comando enseña los atributos y referencias del MVNS. El segundo analiza las 4 señales EMG y examina solo la huella y cabecera binaria del MVN, **sin decodificar cinemática**. El resumen y las gráficas se guardan localmente bajo `data_local/study_output/`.
 
-Si tienes una copia local de `EMG2_Squats.mvn`, la puedes colocar manualmente en `research/source_data/` para analizar su huella, pero **no** se requiere para la primera lección ni para las señales EMG. Ten presente que un binario colocado ahí aparecería como archivo nuevo en `git status` y no debe subirse sin revisar sus metadatos.
+Verifica los tres archivos originales, ya presentes en GitHub:
+
+```powershell
+.\.venv\Scripts\python.exe -m kinoryx.cli verify-session research/source_data
+```
+
+## Estado del estudio: pausa antes de interpretar señales
+
+El usuario ha pedido completar primero el archivo MVN y un informe independiente del reporte web. El MVN ya está incorporado, y la inspección específica de Qualisys quedó documentada en [REPORT_AUDIT_2026-10-31.md](qualisys/REPORT_AUDIT_2026-10-31.md). Las páginas o interacciones no accesibles se identifican en ese documento.
+
+La lección EMG siguiente está preparada pero no se debe ejecutar como siguiente etapa hasta cerrar el alcance pendiente de la auditoría web.
 
 ## Siguiente ejercicio: estudiar la EMG por intervalos
 
