@@ -224,27 +224,30 @@ def recording_palette(rec: EmgRecording):
     return [
         html.Div(
             [
-                html.Div(
-                    [
-                        html.Span(className="lab-color-dot",
-                                  style={"backgroundColor": CHANNEL_COLORS.get(str(ch.id), "#4C6576")}),
-                        html.Strong(academic_channel_name(ch.name)),
-                    ], className="lab-source-heading",
+                html.Span(
+                    className="lab-color-dot",
+                    style={"backgroundColor": CHANNEL_COLORS.get(str(ch.id), "#365d77")},
                 ),
+                html.Span(academic_channel_name(ch.name), className="lab-source-name"),
                 html.Div(
                     [
-                        html.Button("Add to A", type="button",
-                                    className="lab-add-button",
-                                    **{"data-channel": str(ch.id), "data-slot": "left"}),
-                        html.Button("Add to B", type="button",
-                                    className="lab-add-button",
-                                    **{"data-channel": str(ch.id), "data-slot": "right"}),
-                    ], className="lab-add-actions",
+                        html.Button(
+                            "A", type="button", title="Add to panel A",
+                            className="lab-add-button",
+                            **{"data-channel": str(ch.id), "data-slot": "left"},
+                        ),
+                        html.Button(
+                            "B", type="button", title="Add to panel B",
+                            className="lab-add-button",
+                            **{"data-channel": str(ch.id), "data-slot": "right"},
+                        ),
+                    ],
+                    className="lab-add-actions",
                 ),
             ],
             className="emg-palette-item",
             draggable="true",
-            title=f"Drag {academic_channel_name(ch.name)} into Panel A or Panel B",
+            title=f"Drag {academic_channel_name(ch.name)} to panel A or B",
             **{"data-channel": str(ch.id)},
         )
         for ch in rec.channels
@@ -254,18 +257,13 @@ def recording_palette(rec: EmgRecording):
 def workspace_slot(slot: str, label: str):
     return html.Div(
         [
-            html.Div(
-                [
-                    html.Strong(label),
-                    html.Span("Drop channels here, or move them between panels"),
-                ], className="lab-drop-heading",
-            ),
+            html.Span(f"Panel {label}", className="lab-drop-title"),
             html.Div(id=f"lab-{slot}-chips", className="lab-chip-list"),
         ],
         className="emg-dropzone",
+        title="Drag a channel here",
         **{"data-slot": slot},
     )
-
 
 def exploration_content(rec: EmgRecording):
     return html.Div(
