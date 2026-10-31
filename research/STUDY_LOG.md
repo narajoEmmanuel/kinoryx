@@ -4,8 +4,8 @@ Fecha de apertura: 2026-10-30. Rama: `study/xsens-cometa-qualisys-20261030`.
 
 | Orden | Archivo | Conocimiento confirmado en el archivo | Incógnita a resolver | Estado |
 | --- | --- | --- | --- | --- |
-| 1 | `EMG2_Squats.mvns` | XML v2, etiqueta `EMG2_Walkig`, dos referencias a MVN/MVNE, offsets declarados cero | Ejercicio real y sincronización instrumental no verificados | Original en GitHub, guía disponible |
-| 2 | `EMG2_Squats-200714130240.mvne` | 4 canales de Cometa, 2000 Hz, 16527 muestras/canal | Unidad, ganancia, filtrado, artefactos, electrodos, alineación temporal | Original en GitHub, análisis descriptivo disponible |
+| 1 | `EMG2_Squats.mvns` | XML v2, etiqueta `EMG2_Walkig`, dos referencias a MVN/MVNE, offsets declarados cero | Ejercicio real y sincronización instrumental no verificados | Lección 01 ejecutada en Cursor, lectura correcta |
+| 2 | `EMG2_Squats-200714130240.mvne` | 4 canales de Cometa, 2000 Hz, 16527 muestras/canal | Unidad, ganancia, filtrado, artefactos, electrodos, alineación temporal | Inspección ejecutada en Cursor, guía 02 disponible |
 | 3 | `EMG2_Squats.mvn` | Archivo binario original inspeccionado fuera de GitHub y registrado mediante SHA-256 | Formato decodificado, unidades, frames, segmentos, tiempo, ángulos | Binario aún no transferido a GitHub |
 | 4 | `EMG2_Squats_emg.csv` + `*.metadata.json` | Derivados locales del EMG original | Fidelidad, limitaciones de tiempo relativo y consistencia | Pendiente |
 | 5 | Reporte Qualisys | URL documentada | Contenido verificable, permisos, relación con la sesión | Pendiente |
@@ -20,7 +20,15 @@ Fecha de apertura: 2026-10-30. Rama: `study/xsens-cometa-qualisys-20261030`.
 
 **Resultados documentados desde el archivo original proporcionado:** índice XML de 291 bytes con etiqueta de sesión `EMG2_Walkig`, comentario idéntico y exactamente dos referencias: `EMG2_Squats.mvn` y `EMG2_Squats-200714130240.mvne`. Ambas entradas declaran `timeOffset=0` y `timeEndOffset=0`. Se registró discrepancia de nombre frente a `Squats`. Véase [Lección 01](lessons/01_MVNS.md).
 
-**Ejecución en Cursor por el usuario:** pendiente. Este resumen se basa en la lectura del archivo adjunto, no en una ejecución confirmada en su PC.
+**Ejecución en Cursor por el usuario:** confirmada el 2026-10-31. `research/lessons/01_mvns.py` leyó correctamente el índice y confirmó `EMG2_Walkig`, 2 referencias, offsets `0`, EMG presente y binario MVN ausente. `research/study_files.py --plots` confirmó cuatro canales, 2000 Hz, 16527 muestras por canal, y generó las salidas bajo `data_local/study_output`. El resultado de `pytest` previo fue 33 aprobadas, 1 omitida.
+
+### Sesión 02: lectura experimental de EMG
+
+**Estado:** guía y programa listos; ejecución de `02_emg.py` por el usuario todavía no confirmada.
+
+**Instrucciones:** [Lección 02](lessons/02_EMG.md), `research/lessons/02_emg.py`. Empezar con ventanas de 0,25 s, documentar estadísticos originales y comparar vistas sin equipararlos con fuerza ni activación normalizada.
+
+**Limitaciones:** unidades y calibración desconocidas, relación física con MVN y Qualisys sin verificar.
 
 **Preguntas abiertas:** ¿es caminata o sentadilla?, ¿hay exportación MVNX del movimiento?, ¿cómo fueron colocados los electrodos?, ¿es el mismo ensayo que el reporte Qualisys?
 
