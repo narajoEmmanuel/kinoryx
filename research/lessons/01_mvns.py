@@ -3,7 +3,7 @@
 Ejecutar desde la raíz del repositorio:
     .venv\\Scripts\\python.exe research\\lessons\\01_mvns.py
 
-Los originales deben estar en data_local/ y nunca se suben a GitHub.
+La rama de estudio contiene los archivos MVNS y MVNE en research/source_data/.
 """
 
 import argparse
@@ -20,12 +20,12 @@ def main() -> None:
     parser.add_argument(
         "--session",
         type=Path,
-        default=Path("data_local/EMG2_Squats.mvns"),
+        default=Path("research/source_data/EMG2_Squats.mvns"),
         help="Path to local MVNS index (not a remote URL)",
     )
     args = parser.parse_args()
     if not args.session.is_file():
-        parser.error("No encuentro el MVNS local. Extrae primero los datos en data_local/.")
+        parser.error("No encuentro el MVNS. Actualiza esta rama de estudio con git pull.")
     info = read_session(args.session)
     print("=== ESTUDIO 01: MVNS ===")
     print(f"Archivo: {info['file']['name']}")
