@@ -59,3 +59,19 @@ Fecha de apertura: 2026-10-30. Rama: `study/xsens-cometa-qualisys-20261030`.
 The 2000 unprocessed samples per channel show maximum absolute sample times at 1.3890 s (right rectus femoris), 1.5120 s (left rectus femoris), 1.9755 s (right biceps femoris), and 1.8540 s (left biceps femoris). These values are neither EMG activation onset times nor proof of muscle coordination. All amplitudes remain in unknown original units. No filters or signal transformations were applied.
 
 **Next:** inspect the plotted raw waveforms between 1.0 and 2.0 s on the local server, decide whether excursions are sustained or isolated, then move to another window before signal-quality assessment.
+
+
+### Cierre de sesión, 2026-10-31, diseño y laboratorio EMG
+
+**Estado del trabajo:** el usuario dio por terminada la sesión de hoy. Se conserva íntegramente el trabajo en `study/xsens-cometa-qualisys-20261030`, sin merge, PR ni despliegue a producción. El último commit de implementación y documentación visual al cierre es `ba4bbf6c4b7e75551d8300b93eda19bd215baf03`; GitHub Actions confirmó éxito en Python 3.11, 3.12 y 3.13. La rama `main` permanece separada.
+
+**Arquitectura visual conservada:**
+- Home `/`, pantalla limpia que enlaza a Laboratory y Dashboard.
+- Dashboard `/dashboard/`, preserva los análisis anteriores.
+- Laboratory `/lab/` y las cuatro subpáginas persistentes: `exploration`, `quality`, `experimentation`, `evaluation`.
+- Exploratory Analysis muestra cuatro señales originales (`All channels`), una sola (`Single channel`) o comparación arrastrable (`Compare`). En comparación, `Side by side`, `Stacked` y `Overlay` conservan muestras crudas y colores diferenciados. Panel B solo aparece si se utiliza.
+- Ajustes del diseño aprobados para revisión: barra superior en el azul oficial `#0847A6`, nombre de subpágina centrado, subpestañas de cuaderno con bordes curvos y estado activo azul, tipografías originales, mínimo de 12 px para texto y 10 px para gráficas, y pie de página centrado que solo dice `KINORYX`.
+
+**Investigación preservada:** los tres originales Xsens/Cometa están versionados y su integridad ya fue verificada. Se conservan el informe de auditoría documental Qualisys, la documentación de las cuatro etapas y los resultados descriptivos del experimento `First EMG Burst (1.0 to 2.0 s)`. No hay conclusiones biomecánicas, fisiológicas ni sincronización validadas; aún quedan pendientes el análisis de calidad de señal, los ensayos de procesamiento y la evaluación final.
+
+**Retomar cuando el usuario lo solicite:** revisar la versión en `http://127.0.0.1:8050/lab/exploration`, continuar refinamientos únicamente con aprobación y proseguir la etapa exploratoria antes de avanzar al estudio del ruido. El servidor local ya está configurado con recarga automática, por lo que el usuario normalmente solo necesita actualizar la rama desde otra terminal. No asumir que el `git pull` local de este cierre ya se realizó.
