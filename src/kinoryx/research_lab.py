@@ -15,6 +15,7 @@ from plotly.subplots import make_subplots
 from scipy.signal import butter, sosfiltfilt
 
 from kinoryx.io.xsens_emg import EmgRecording, read_mvne
+from kinoryx.plot_layout import plan_subplot_layout
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "research/source_data/EMG2_Squats-200714130240.mvne"
@@ -66,6 +67,22 @@ def preview_transform(samples: np.ndarray, fs: float, mode: str) -> np.ndarray:
     raise ValueError("Unknown preview mode")
 
 
+def academic_channel_name(name: str) -> str:
+    """Display anatomy as 'Right rectus femoris', without changing source metadata."""
+    parts = name.strip().split()
+    if len(parts) > 1 and parts[-1].lower() in ("left", "right"):
+        return f"{parts[-1].capitalize()} {' '.join(parts[:-1]).lower()}"
+    return name
+
+
+def comparison_label(mode: str) -> str:
+    return {
+        "raw": "Raw EMG",
+        "bandpass": "Band-pass filter (20 to 450 Hz)",
+        "rms": "RMS amplitude (250 ms window)",
+    }[mode]
+
+
 def make_emg_figure(
     recording: EmgRecording,
     selected: str,
@@ -90,20 +107,25 @@ def make_emg_figure(
                for ch, raw in zip(recording.channels, recording.samples)
                if selected == "all" or str(ch.id) == selected]
     comparative = mode != "raw"
+    cols = 2 if comparative else 1
+    labels = [
+        title
+        for ch, _ in visible
+        for title in (
+            [
+                f"{academic_channel_name(ch.name)} | Raw EMG",
+                f"{academic_channel_name(ch.name)} | {comparison_label(mode)}",
+            ] if comparative else [f"{academic_channel_name(ch.name)} | Raw EMG"]
+        )
+    ]
+    geometry = plan_subplot_layout(labels, cols=cols, minimum_height=460)
     figure = make_subplots(
-        rows=len(visible),
-        cols=2 if comparative else 1,
+        rows=geometry.rows,
+        cols=cols,
         shared_xaxes="all",
-        horizontal_spacing=0.065,
-        vertical_spacing=0.11 if len(visible) > 1 else 0,
-        subplot_titles=[
-            label
-            for ch, _ in visible
-            for label in (
-                [f"{ch.name} | Original", f"{ch.name} | {mode.upper()}"]
-                if comparative else [f"{ch.name} | Original"]
-            )
-        ],
+        horizontal_spacing=0.085 if comparative else 0.0,
+        vertical_spacing=geometry.vertical_spacing,
+        subplot_titles=geometry.titles,
     )
     t = np.arange(first, last) / fs
     for row, (ch, raw) in enumerate(visible, start=1):
@@ -111,8 +133,8 @@ def make_emg_figure(
             go.Scattergl(
                 x=t, y=raw[first:last], mode="lines",
                 line={"color": RAW_COLOR, "width": 1},
-                name=f"{ch.name}, original",
-                hovertemplate="t=%{x:.4f} s<br>Original=%{y:.3f} (unidades desconocidas)<extra></extra>",
+                name=f"{academic_channel_name(ch.name)}, raw EMG",
+                hovertemplate="Time: %{x:.4f} s<br>Raw EMG: %{y:.3f} (unit unknown)<extra></extra>",
             ), row=row, col=1,
         )
         if comparative:
@@ -121,22 +143,47 @@ def make_emg_figure(
                 go.Scattergl(
                     x=t, y=transformed[first:last], mode="lines",
                     line={"color": PREVIEW_COLOR, "width": 1.3},
-                    name=f"{ch.name}, {mode}",
-                    hovertemplate="t=%{x:.4f} s<br>Preview=%{y:.3f} (escala original)<extra></extra>",
+                    name=f"{academic_channel_name(ch.name)}, {comparison_label(mode)}",
+                    hovertemplate="Time: %{x:.4f} s<br>Preview: %{y:.3f} (uncalibrated)<extra></extra>",
                 ), row=row, col=2,
             )
     figure.update_layout(
         template="plotly_white",
-        height=max(380, len(visible) * (300 if comparative else 240)),
-        margin={"l": 76, "r": 25, "t": 72, "b": 67},
+        height=geometry.height,
+        margin={
+            "l": 130,
+            "r": 32,
+            "t": 76 + 21 * (geometry.title_lines - 1),
+            "b": 88,
+        },
         showlegend=False,
         hovermode="x",
         font={"family": "Arial, sans-serif", "color": "#34383A", "size": 12},
         paper_bgcolor="#fff",
         plot_bgcolor="#fff",
     )
-    figure.update_yaxes(title_text="Valores originales (unidad no confirmada)", zeroline=True)
-    figure.update_xaxes(title_text="Tiempo relativo (s)", showgrid=True, gridcolor="#edf0f0")
+    figure.update_annotations(font={"family": "Arial, sans-serif", "size": 12})
+    # A single shared label avoids four long, vertically overlapping axis labels.
+    figure.update_yaxes(
+        title_text=None, zeroline=True, automargin=True,
+        showgrid=True, gridcolor="#edf0f0",
+    )
+    figure.update_xaxes(
+        title_text=None, showgrid=True, gridcolor="#edf0f0",
+        automargin=True,
+    )
+    for column in range(1, cols + 1):
+        figure.update_xaxes(
+            title_text="Relative time (s)",
+            title_standoff=16,
+            row=geometry.rows, col=column,
+        )
+    figure.add_annotation(
+        x=-0.10, y=0.5, xref="paper", yref="paper",
+        text="EMG amplitude (unit not established)",
+        textangle=-90, showarrow=False,
+        font={"family": "Arial, sans-serif", "size": 12, "color": "#34383A"},
+    )
     return figure
 
 
@@ -146,32 +193,32 @@ def build_layout() -> html.Main:
     except (OSError, ValueError) as exc:
         return html.Main(
             [
-                html.H1("KINORYX | Laboratorio EMG"),
-                html.P(f"Datos no disponibles: {exc}"),
-                html.A("Volver al dashboard", href="/"),
+                html.H1("KINORYX | EMG Research Laboratory"),
+                html.P(f"Research data unavailable: {exc}"),
+                html.A("Return to dashboard", href="/"),
             ],
             className="app-shell lab-shell",
         )
-    channel_options = [{"label": "Los cuatro canales", "value": "all"}]
+    channel_options = [{"label": "All four EMG channels", "value": "all"}]
     channel_options.extend(
-        {"label": f"{ch.id} | {ch.name}", "value": str(ch.id)}
+        {"label": f"{ch.id} | {academic_channel_name(ch.name)}", "value": str(ch.id)}
         for ch in recording.channels
     )
     return html.Main(
         [
             html.Header(
                 [
-                    html.A("← Volver al dashboard de marcha", href="/", className="lab-back"),
+                    html.A("← Back to gait dashboard", href="/", className="lab-back"),
                     html.Div("KINORYX / RESEARCH ONLY", className="brand-kicker"),
-                    html.H1("Laboratorio EMG", className="page-title"),
+                    html.H1("EMG Research Laboratory", className="page-title"),
                     html.P(
-                        "Visualización interactiva del archivo Cometa original. "
-                        "Antes de transformar una señal, observa cómo fue registrada.",
+                        "Interactive visualization of the original Cometa EMG recording. "
+                        "Inspect the unprocessed signal before evaluating any transformation.",
                         className="page-subtitle",
                     ),
                     html.P(
-                        "Experimental · Solo localhost · No modifica las grabaciones · "
-                        "No se incorpora a main",
+                        "Research only · Localhost · Source files remain unchanged · "
+                        "Not merged into main",
                         className="lab-caution",
                     ),
                 ],
@@ -181,19 +228,19 @@ def build_layout() -> html.Main:
                 [
                     html.Div(
                         [
-                            html.H2("Registro", className="section-title"),
+                            html.H2("Recording", className="section-title"),
                             html.P(SOURCE.name, className="lab-source"),
                             html.Div(
                                 [
-                                    html.Div([html.Small("Canales"), html.Strong(str(len(recording.channels)))]),
-                                    html.Div([html.Small("Muestreo"), html.Strong(f"{recording.sampling_hz:g} Hz")]),
-                                    html.Div([html.Small("Muestras / canal"), html.Strong(f"{recording.sample_count:,}")]),
-                                    html.Div([html.Small("Duración aprox."), html.Strong(f"{recording.sample_span_s:.3f} s")]),
+                                    html.Div([html.Small("Channels"), html.Strong(str(len(recording.channels)))]),
+                                    html.Div([html.Small("Sampling rate"), html.Strong(f"{recording.sampling_hz:g} Hz")]),
+                                    html.Div([html.Small("Samples per channel"), html.Strong(f"{recording.sample_count:,}")]),
+                                    html.Div([html.Small("Recording span"), html.Strong(f"{recording.sample_span_s:.3f} s")]),
                                 ], className="lab-metrics",
                             ),
                             html.P(
-                                "Las etiquetas musculares vienen del XML; "
-                                "las unidades, calibración y sincronización siguen sin verificarse.",
+                                "Muscle labels are taken from the source XML; "
+                                "amplitude units, calibration and synchronization are unverified.",
                                 className="lab-help",
                             ),
                         ],
@@ -201,44 +248,44 @@ def build_layout() -> html.Main:
                     ),
                     html.Div(
                         [
-                            html.H2("Explorar", className="section-title"),
-                            html.Label("Canal", htmlFor="lab-channel", className="control-label"),
+                            html.H2("Signal explorer", className="section-title"),
+                            html.Label("EMG channel", htmlFor="lab-channel", className="control-label"),
                             dcc.Dropdown(
                                 id="lab-channel", options=channel_options, value="all",
                                 clearable=False,
                             ),
-                            html.Label("Inicio del intervalo (s)", htmlFor="lab-start", className="control-label"),
+                            html.Label("Window start (s)", htmlFor="lab-start", className="control-label"),
                             dcc.Slider(
                                 id="lab-start", min=0, max=8, step=0.1, value=0,
                                 marks={0: "0", 2: "2", 4: "4", 6: "6", 8: "8"},
                                 tooltip={"placement": "bottom", "always_visible": False},
                             ),
-                            html.Label("Duración del intervalo", htmlFor="lab-window", className="control-label"),
+                            html.Label("Window duration", htmlFor="lab-window", className="control-label"),
                             dcc.RadioItems(
                                 id="lab-window",
                                 options=[
                                     {"label": "0.25 s", "value": 0.25},
                                     {"label": "1 s", "value": 1.0},
                                     {"label": "2 s", "value": 2.0},
-                                    {"label": "Completa", "value": 8.3},
+                                    {"label": "Full recording", "value": 8.3},
                                 ],
                                 value=8.3, inline=True,
                                 className="lab-inline",
                             ),
-                            html.Label("Vista de procesamiento", htmlFor="lab-transform", className="control-label"),
+                            html.Label("Signal view", htmlFor="lab-transform", className="control-label"),
                             dcc.RadioItems(
                                 id="lab-transform",
                                 options=[
-                                    {"label": "Original", "value": "raw"},
-                                    {"label": "Comparar filtro 20 a 450 Hz", "value": "bandpass"},
-                                    {"label": "Comparar RMS 250 ms", "value": "rms"},
+                                    {"label": "Raw EMG", "value": "raw"},
+                                    {"label": "Compare band-pass, 20 to 450 Hz", "value": "bandpass"},
+                                    {"label": "Compare RMS, 250 ms window", "value": "rms"},
                                 ],
                                 value="raw", className="lab-inline",
                             ),
                             html.P(
-                                "Los filtros son vistas experimentales y no un método "
-                                "validado para este registro. Siempre se conserva "
-                                "una gráfica original junto al resultado.",
+                                "Signal processing previews are exploratory and not validated "
+                                "for this recording. The unprocessed signal is always displayed "
+                                "alongside any transformed preview.",
                                 className="lab-help",
                             ),
                         ],
@@ -249,16 +296,16 @@ def build_layout() -> html.Main:
             ),
             html.Section(
                 [
-                    html.H2("Señales y comparación", className="section-title"),
+                    html.H2("EMG signals and exploratory comparisons", className="section-title"),
                     html.Div(id="lab-status", className="status-banner", role="status"),
                     dcc.Loading(
                         dcc.Graph(id="lab-figure", config=CONFIG, className="lab-figure"),
                         type="circle",
                     ),
                     html.P(
-                        "Eje X: segundos relativos. Eje Y: valores registrados sin unidad "
-                        "confirmada. La comparación no equivale a activación muscular, "
-                        "normalización ni diagnóstico.",
+                        "Time is relative to the first sample. EMG amplitudes have no confirmed "
+                        "physical unit or normalization reference. These comparisons do not "
+                        "establish muscle force, activation levels or a clinical diagnosis.",
                         className="lab-help",
                     ),
                 ], className="lab-plot-section",
@@ -266,8 +313,8 @@ def build_layout() -> html.Main:
             html.Footer(
                 [
                     html.P(
-                        "Laboratorio temporal para decidir qué investigar y qué validar "
-                        "antes de modificar la aplicación principal."
+                        "Experimental workspace for assessing methods and validating evidence "
+                        "before changing the production application."
                     ),
                 ], className="page-footer",
             ),
@@ -299,11 +346,11 @@ def mount_research_lab(flask_server) -> Dash:
         try:
             recording = load_source()
             figure = make_emg_figure(recording, channel, start, window, mode)
-            label = "Solo señal original" if mode == "raw" else (
-                f"Original frente a {mode}, comparación experimental"
+            label = "Raw, unprocessed EMG" if mode == "raw" else (
+                f"Raw EMG compared with {comparison_label(mode)} (exploratory)"
             )
-            return figure, f"{label}. El archivo original no se modifica."
+            return figure, f"{label}. Original recording preserved."
         except (ValueError, OSError) as exc:
-            return go.Figure(), f"No se pudo mostrar la vista: {exc}"
+            return go.Figure(), f"Unable to display requested view: {exc}"
 
     return lab
