@@ -7,7 +7,7 @@
 
   const allowed = new Set(["0", "1", "2", "3"]);
   const slots = ["left", "right"];
-  const fallback = {left: ["0"], right: ["2"]};
+  const fallback = {left: ["0"], right: []};
 
   function state() {
     const value = window.__kinoryxWorkspaceState;
@@ -104,7 +104,7 @@
       return;
     }
     if (event.target.closest(".lab-workspace-reset")) {
-      commit({left: ["0"], right: ["2"]});
+      commit({left: ["0"], right: []});
     }
   });
 })();
