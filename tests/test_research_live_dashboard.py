@@ -184,7 +184,7 @@ def test_raw_workspace_arrangements_preserve_original_points():
     assert len(overlay.data) == len(side.data) == len(stacked.data) == 2
     for figure in (overlay, side, stacked):
         assert all(len(trace.x) == 500 for trace in figure.data)
-        assert "Right" not in " ".join(trace.name for trace in figure.data)
+        assert all("synthetic" in trace.name for trace in figure.data)
         np.testing.assert_allclose(
             np.asarray(figure.data[0].y, dtype=float),
             np.asarray(recording.samples[0][200:700], dtype=float),
