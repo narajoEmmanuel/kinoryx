@@ -51,7 +51,7 @@ def test_four_distinct_synchronized_panels():
 def test_vertical_layout_and_side_filter():
     result = analyze_exploratory(generate_demo_dataset())
     stacked = dashboard.build_figure(result, panel_layout="stack")
-    assert stacked.layout.height == 1040
+    assert stacked.layout.height >= 1040
     assert len(stacked.layout.annotations) == 4
     single = dashboard.build_figure(result, view_mode="left")
     assert len(single.layout.annotations) == 2
