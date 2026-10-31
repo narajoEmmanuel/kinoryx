@@ -41,6 +41,8 @@ The dashboard imports the engine. The engine must never import the dashboard or 
 
 The project now tracks a [user-provided Qualisys web report and an inspected Xsens/Cometa EMG example](docs/RESEARCH_SOURCES.md) as foundational research references. The specific Qualisys report's metrics remain unverified, and the sources are not assumed to be synchronized or from the same session. Only code, tests and non-sensitive data provenance are kept in GitHub. Human recordings stay local.
 
+The provided three-file capture is registered in [its immutable source manifest](examples/research/EMG2_Squats.manifest.json). After placing the originals in the ignored `data_local/` directory, run `kinoryx verify-session data_local` to verify all three SHA-256 checksums, session references and EMG structure. This approval covers use as a foundational research reference, not unrestricted publication of private recordings.
+
 Use `kinoryx inspect-emg data_local/your_recording.mvne` to inspect MVNE metadata or `kinoryx export-emg data_local/your_recording.mvne` for a raw-value CSV plus a JSON metadata file. This path is **not** the demonstration gait-event processing pipeline; EMG units, normalization and validation remain unresolved.
 
 ## License and privacy
