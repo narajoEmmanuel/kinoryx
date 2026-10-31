@@ -28,3 +28,7 @@ The independent `.mvne` XML reader in `kinoryx.io.xsens_emg` supports numeric sc
 The optional local export produces `time_s` as channel-local sample index divided by header sampling frequency, and one unscaled `emg_ch<ID>_raw` column per channel. A sidecar JSON records channel/source labels, the exact source SHA-256, reported sample rate, sample count and unresolved units/synchronization status.
 
 These raw channels are **not** gyroscope columns and cannot be passed to the gait-event `inspect`/`explore` commands as though they were validated gait signals. No raw EMG unit, electrode placement, gain, filtering or absolute cross-system synchronization is inferred. See [Research sources](RESEARCH_SOURCES.md).
+
+## Approved Xsens/Cometa research bundle verification
+
+The supplied `.mvn`, `.mvns` and `.mvne` filenames, expected byte lengths and SHA-256 hashes are recorded in [the source manifest](../examples/research/EMG2_Squats.manifest.json). `kinoryx verify-session data_local` checks exact file integrity, ensures the `.mvns` XML indexes the expected names, and validates the `.mvne` scalar channels. Verification does not imply calibration, medical validity, correct exercise labels or synchronization with the independent Qualisys web report. The private source recordings themselves remain outside GitHub.
