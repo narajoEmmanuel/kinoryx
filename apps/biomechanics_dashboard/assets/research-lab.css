@@ -83,3 +83,49 @@
   .lab-inline { gap: 10px 13px; }
   .lab-shell .page-title { font-size: 1.9rem; }
 }
+
+/* Content-led sizing: headings and controls grow when academic labels wrap. */
+.lab-shell,
+.lab-shell section,
+.lab-shell header,
+.lab-shell .lab-controls-pane,
+.lab-shell .lab-source-pane,
+.lab-shell .lab-plot-section,
+.lab-shell .lab-figure,
+.lab-shell .lab-figure .js-plotly-plot {
+  min-height: 0;
+  height: auto;
+}
+.lab-shell .page-title,
+.lab-shell .section-title,
+.lab-shell .control-label,
+.lab-shell .lab-source,
+.lab-shell .lab-help,
+.lab-shell .lab-inline label,
+.lab-nav-link,
+.lab-shell .lab-metrics strong {
+  max-width: 100%;
+  height: auto;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+.lab-shell .lab-figure .js-plotly-plot,
+.lab-shell .lab-figure .plot-container {
+  width: 100%;
+}
+.lab-shell .Select-control,
+.lab-shell .Select-value,
+.lab-shell .Select-value-label {
+  min-height: 38px;
+  height: auto;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+.lab-shell .lab-inline label {
+  align-items: flex-start;
+}
+@media (max-width: 640px) {
+  .lab-shell .lab-metrics strong { font-size: 1rem; }
+  .lab-shell .lab-controls-pane .control-label { margin-top: 18px; }
+}
