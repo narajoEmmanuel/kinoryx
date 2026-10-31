@@ -15,3 +15,7 @@ Current peak candidates are not foot contact events. The project has no clinical
 9. Explicitly report cases where an event cannot be determined.
 
 Do not infer ground reaction forces, joint moments, medical diagnoses or full gait subphases from unsupported sensors. Synthetic test success is a software integration check, never clinical validation.
+
+## Imported EMG and external report comparison
+
+An MVNE sample reader establishes only software-level data integrity and traceability. Before studying EMG activation, record electrode placement and laterality, measurement units and amplifier gains, acquisition filtering, preprocessing and normalization protocol. Before correlating this data with motion or the linked Qualisys report, confirm both sources describe the same acquisition, establish their coordinate systems and synchronized clocks, and independently verify all exported Qualisys metrics and units. The currently supplied material does not establish these conditions. See [Research sources](RESEARCH_SOURCES.md).
