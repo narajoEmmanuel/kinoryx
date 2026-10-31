@@ -19,6 +19,14 @@ Abre en el navegador:
 
 Hay un enlace a la vista de EMG en el encabezado del dashboard original, y un enlace de retorno dentro del laboratorio. Si el puerto 8050 ya está ocupado por un servidor anterior, detenlo con Ctrl+C en aquella terminal antes de iniciarlo.
 
+## Display language and adaptive chart layout
+
+**Interface language:** academic English throughout the existing gait dashboard and the temporary EMG laboratory. This includes navigation, controls, figure headings, axis captions, hover details and status messages. Muscle labels use conventional `Right/Left rectus femoris` and `Right/Left biceps femoris` wording for display only; the original labels and source bytes remain untouched.
+
+**Figure typography and spacing:** subplot headings are wrapped and HTML-escaped, figure height and spacing between rows scale to the longest wrapped title, and a single shared EMG amplitude caption replaces the four overlapping vertical labels. Time is labeled `Relative time (s)` on the bottom row. The SVG export follows the computed figure size rather than forcing a fixed height. Headings and control text in the layout can wrap without fixed-height clipping.
+
+**Scientific nomenclature:** `Raw EMG`, `EMG amplitude (unit not established)`, `Sampling rate`, `Relative time`, `Band-pass filter`, and `RMS amplitude`. The distinction between original, non-normalized signal and derived amplitude measures follows the CEDE consensus nomenclature. See https://cede.isek.org/method_detail/42/ and https://doi.org/10.1016/j.jelekin.2020.102438 . This does not imply physiological calibration.
+
 ## Qué puede visualizar el laboratorio
 
 1. El registro original Cometa `EMG2_Squats-200714130240.mvne`, leído desde `research/source_data`. No usa ninguna subida de archivos ni modifica el original.
