@@ -578,39 +578,59 @@ def mount_research_lab(flask_server) -> Dash:
     @lab.callback(
         Output("lab-stage-nav", "children"),
         Output("lab-stage-content", "children"),
+        Output("lab-current-title", "children"),
         Input("lab-location", "pathname"),
     )
     def render_stage(pathname):
         stage = stage_from_path(pathname)
+        title = dict(STAGES)[stage]
         navigation = stage_navigation(stage)
         if stage != "exploration":
-            return navigation, other_stage_content(stage)
+            return navigation, other_stage_content(stage), title
         try:
-            return navigation, exploration_content(load_source())
+            return navigation, exploration_content(load_source()), title
         except (ValueError, OSError) as exc:
             return navigation, html.P(
                 f"Original recording unavailable: {exc}",
                 className="lab-error",
-            )
+            ), title
 
     @lab.callback(
         Output("lab-left-chips", "children"),
         Output("lab-right-chips", "children"),
         Output("lab-comparison-graph", "figure"),
         Output("lab-workspace-note", "children"),
+        Output("lab-compare-controls", "style"),
+        Output("lab-panel-b", "style"),
+        Output("lab-add-b-target", "style"),
+        Output("lab-channel-select-wrap", "style"),
+        Output("lab-arrangement-wrap", "style"),
         Input("lab-workspace", "data"),
         Input("lab-mode", "value"),
         Input("lab-start", "value"),
         Input("lab-window", "value"),
+        Input("lab-view", "value"),
+        Input("lab-single-channel", "value"),
     )
-    def refresh_workspace(state, mode, start, duration):
+    def refresh_workspace(state, mode, start, duration, view, channel):
         rec = load_source()
         current = canonical_workspace(state, rec)
+        is_compare = view == "compare"
+        show_b = is_compare and bool(current["right"])
+        visible = {"display": "block"}
+        hidden = {"display": "none"}
+        component_styles = (
+            visible if is_compare else hidden,
+            visible if show_b else hidden,
+            visible if is_compare and not show_b else hidden,
+            visible if view == "single" else hidden,
+            visible if is_compare else hidden,
+        )
 
         def chips(slot):
             result = []
-            for channel in current[slot]:
-                original = next(ch for ch in rec.channels if str(ch.id) == channel)
+            for channel_id in current[slot]:
+                original = next(ch for ch in rec.channels if str(ch.id) == channel_id)
                 result.append(
                     html.Div(
                         [
@@ -622,33 +642,43 @@ def mount_research_lab(flask_server) -> Dash:
                                 "×", type="button",
                                 title="Remove channel",
                                 className="emg-remove-item",
-                                **{"data-channel": channel, "data-slot": slot},
+                                **{"data-channel": channel_id, "data-slot": slot},
                             ),
                         ],
                         className="emg-active-item",
                         draggable="true",
-                        style={"borderLeftColor": CHANNEL_COLORS.get(channel, "#445")},
-                        **{"data-channel": channel, "data-from-slot": slot},
+                        style={"borderLeftColor": CHANNEL_COLORS.get(channel_id, "#365d77")},
+                        **{"data-channel": channel_id, "data-from-slot": slot},
                     )
                 )
             return result
 
         try:
-            figure = build_workspace_figure(
-                rec, current, mode=mode, start_seconds=float(start),
-                window_seconds=float(duration),
+            if view == "all":
+                figure = make_emg_figure(rec, "all", float(start), float(duration), "raw")
+            elif view == "single":
+                figure = make_emg_figure(rec, str(channel), float(start), float(duration), "raw")
+            elif is_compare:
+                figure = build_workspace_figure(
+                    rec, current, mode=mode, start_seconds=float(start),
+                    window_seconds=float(duration),
+                )
+            else:
+                raise ValueError("Unknown channel view")
+            return (
+                chips("left"), chips("right"), figure,
+                "Raw EMG · Original scale", *component_styles,
             )
-            status = "Raw data · Source scale"
-            return chips("left"), chips("right"), figure, status
-        except (TypeError, ValueError) as exc:
-            return chips("left"), chips("right"), go.Figure(), (
-                f"Unable to display this workspace: {exc}"
+        except (ValueError, TypeError, OSError) as exc:
+            return (
+                chips("left"), chips("right"), go.Figure(),
+                f"Unable to display this view: {exc}", *component_styles,
             )
 
     lab.clientside_callback(
         """
         function(data) {
-            window.__kinoryxWorkspaceState = data || {left: ["0"], right: ["2"]};
+            window.__kinoryxWorkspaceState = data || {left: ["0"], right: []};
             return window.dash_clientside.no_update;
         }
         """,
