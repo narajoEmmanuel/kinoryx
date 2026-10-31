@@ -426,15 +426,7 @@ def create_app() -> Dash:
                 ],
                 className="main-grid",
             ),
-            html.Footer(
-                [
-                    html.P(
-                        "Research prototype · Exploratory peaks are not validated gait events or clinical measurements.",
-                        className="footer-copy",
-                    )
-                ],
-                className="page-footer",
-            ),
+            html.Footer("KINORYX", className="kinoryx-bottom-bar"),
         ],
         className="app-shell",
     )
