@@ -112,3 +112,31 @@ def test_plot_layout_expands_when_scientific_titles_are_long():
     escaped, lines = wrap_plot_title("<test> & signal", 10)
     assert "&lt;" in escaped and "&amp;" in escaped
     assert lines >= 2
+
+
+
+def test_local_server_enables_hot_reload(monkeypatch):
+    """Ensure local development can keep the same server process workflow."""
+    file_path = Path(__file__).resolve().parents[1] / "apps/biomechanics_dashboard/app.py"
+    spec = importlib.util.spec_from_file_location("kinoryx_dev_reload_test_app", file_path)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    class StubApp:
+        def __init__(self):
+            self.kwargs = None
+
+        def run(self, **kwargs):
+            self.kwargs = kwargs
+
+    app = StubApp()
+    monkeypatch.setattr(module, "create_app", lambda: app)
+    module.run_local_server()
+    assert app.kwargs == {
+        "host": "127.0.0.1",
+        "port": 8050,
+        "debug": True,
+        "use_reloader": True,
+        "dev_tools_hot_reload": True,
+    }
