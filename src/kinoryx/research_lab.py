@@ -28,8 +28,6 @@ CONFIG = {
     "toImageButtonOptions": {
         "format": "svg",
         "filename": "kinoryx_research_emg",
-        "height": 1000,
-        "width": 1500,
         "scale": 1,
     },
 }
@@ -329,7 +327,7 @@ def mount_research_lab(flask_server) -> Dash:
         server=flask_server,
         url_base_pathname="/lab/",
         assets_folder=str(ASSETS),
-        title="KINORYX | Laboratorio EMG",
+        title="KINORYX | EMG Research Laboratory",
         suppress_callback_exceptions=True,
     )
     lab.layout = build_layout()
