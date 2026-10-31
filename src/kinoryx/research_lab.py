@@ -293,6 +293,14 @@ def exploration_content(rec: EmgRecording):
                 ],
                 className="lab-progress-strip",
             ),
+            html.P(
+                html.A(
+                    "Review all Stage 01 notes and progress",
+                    href=GITHUB_ROOT + "research/laboratory/01_exploratory_analysis.md",
+                    target="_blank", rel="noopener noreferrer",
+                ),
+                className="lab-stage-record",
+            ),
             html.Div(
                 [
                     html.Aside(
@@ -461,9 +469,9 @@ STAGE_CONTENT = {
 def other_stage_content(stage: str):
     title, description, status, tasks = STAGE_CONTENT[stage]
     next_docs = {
-        "quality": "research/STUDY_LOG.md",
-        "experimentation": "research/lessons/02_EMG.md",
-        "evaluation": "research/DECISION_LOG.md",
+        "quality": "research/laboratory/02_signal_quality.md",
+        "experimentation": "research/laboratory/03_processing_experiments.md",
+        "evaluation": "research/laboratory/04_evaluation_reporting.md",
     }
     return html.Section(
         [
