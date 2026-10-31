@@ -209,7 +209,7 @@ def test_empty_panel_b_never_generates_a_blank_plot():
         assert len(figure.data) == 1
         assert len(figure.data[0].x) == 500
         assert not any("Panel B" in annotation.text for annotation in figure.layout.annotations)
-        assert figure.layout.xaxis2 is None
+        assert "xaxis2" not in figure.layout.to_plotly_json()
         assert figure.data[0].line.color is not None
 
 
