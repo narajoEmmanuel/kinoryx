@@ -27,6 +27,26 @@ Hay un enlace a la vista de EMG en el encabezado del dashboard original, y un en
 
 **Scientific nomenclature:** `Raw EMG`, `EMG amplitude (unit not established)`, `Sampling rate`, `Relative time`, `Band-pass filter`, and `RMS amplitude`. The distinction between original, non-normalized signal and derived amplitude measures follows the CEDE consensus nomenclature. See https://cede.isek.org/method_detail/42/ and https://doi.org/10.1016/j.jelekin.2020.102438 . This does not imply physiological calibration.
 
+## Actualización sin reinicios manuales repetidos
+
+El servidor del worktree experimental usa **Dash hot reload y Werkzeug auto-reload**, siempre vinculado a `127.0.0.1:8050`. Cuando se actualiza un archivo Python importado por la aplicación, el proceso de desarrollo vuelve a cargar su código automáticamente. Para CSS y archivos de interfaz, Dash también intenta actualizar el navegador sin intervención. En casos aislados puede ser necesaria una recarga de la pestaña (F5), **no detener el servidor manualmente**.
+
+Hay una única transición al activar esta capacidad desde la versión anterior con `debug=False`:
+
+```powershell
+# Solo una vez, detener el servidor antiguo con Ctrl+C.
+cd C:\dev\kinoryx-study
+git pull --ff-only
+.\.venv\Scripts\python.exe apps\biomechanics_dashboard\app.py
+```
+
+Después, mantener esa terminal abierta mientras se investiga. En actualizaciones normales:
+1. Los cambios se guardan en GitHub y se prueban primero.
+2. Se hace `git pull --ff-only` desde **otra terminal** de Cursor, sin detener la que aloja Dash.
+3. El servidor de desarrollo detecta cambios de código y se reinicia por sí mismo; el navegador debería refrescar el contenido. Si solo quedó la página antigua, pulsar F5.
+
+No se garantiza que las conexiones interactivas permanezcan sin interrupción durante el reinicio automático del worker. Cambios de dependencias, instalación de paquetes o fallos del recargador pueden exigir una intervención excepcional, no un reinicio en cada cambio. La recarga automática es adecuada **solo para el desarrollo local**, nunca para publicar este laboratorio.
+
 ## Qué puede visualizar el laboratorio
 
 1. El registro original Cometa `EMG2_Squats-200714130240.mvne`, leído desde `research/source_data`. No usa ninguna subida de archivos ni modifica el original.
