@@ -3,6 +3,9 @@
 **Fecha de inspección:** 2026-10-31  
 **Fuente concreta:** https://report.qualisys.com/r/f8pMFlrTA/details  
 **Alcance:** lectura del contenido renderizado de la pestaña del reporte en el navegador conectado, contrastada con la documentación oficial de Qualisys. **No** es una exportación de datos de origen ni una copia integral offline.  
+**Estado:** CERRADO como auditoría documental de las dos vistas disponibles, `Test results` y `Findings`. No constituye una prueba completa de todas las interacciones ni una exportación de datos crudos.  
+**Última comprobación:** 2026-10-31, lectura directa de `/summary` en la pestaña del usuario.  
+
 **Regla de evidencia:** diferenciar el contenido efectivamente visible del comportamiento descrito por el fabricante y de las funcionalidades que no se probaron. No inventar curvas, extremos o valores que la inspección textual no expone.
 
 ## 1. Identificación del reporte observado
@@ -29,7 +32,7 @@ El título de la pestaña del navegador era **John Doe | Gait | Qualisys Web Rep
 
 La interfaz ofrece dos vistas diferentes:
 - **Test results**: el apartado **inspeccionado** desde el enlace recibido.
-- **Findings**: enlace separado a una vista `/summary`. Su contenido específico **no se pudo leer desde la sesión de inspección actual**, así que no se atribuyen conclusiones clínicas ni hallazgos a esa pestaña.
+- **Findings**: vista `/summary`, **inspeccionada directamente** el 2026-10-31. Presenta el encabezado `Impairments` y el mensaje literal **“There are no impairments to display yet.”** No se muestra una lista de alteraciones, prioridades, comentarios ni interpretaciones clínicas. Esto **no demuestra ausencia de alteraciones**, solo que esa sección no tiene elementos visibles en el reporte consultado.
 
 ## 2. Organización de los resultados
 
@@ -173,6 +176,21 @@ El panel **Export** muestra:
 
 La plataforma admite exportaciones PDF según permisos/suscripción, pero **no se generó ni descargó PDF**, y la vista actual no demostró que el botón completara la exportación.
 
+## 3.6 Findings, verificación final de la vista de resumen
+
+**Acceso realmente observado:** el usuario abrió `Findings` y el navegador conectado mostró la ruta `https://report.qualisys.com/r/5fa134028746b70ebb5d8c7f/summary`. La interfaz conservó el título `John Doe | Gait | Qualisys Web Report`, la identificación GaitCAST, la fecha de evaluación y los tres ensayos del panel `Report data`. El enlace recibido originalmente usa otra cadena de ruta, `/r/f8pMFlrTA/details`; ambas vistas presentaron la misma identidad y datos visibles del reporte. No se deduce de ello la identidad externa del sujeto.
+
+**Contenido específico de Findings:**
+- Título de navegación: `Findings`.
+- Apartado disponible: `Impairments`.
+- Texto exacto: `There are no impairments to display yet.`
+- No aparecen tarjetas ni descripciones de impairments en el contenido renderizado.
+- Persisten los paneles `Report data`, `Video & 3D` y `Export`; el panel Export continúa mostrando `Not ready` y `Generate PDF`.
+
+**Interpretación estricta:** la pestaña presenta una sección vacía, por lo que este reporte **no contiene hallazgos redactados visibles en Findings**. No equivale a un resultado clínico normal, no excluye alteraciones biomecánicas y no permite inferir cómo se generan o editan esos hallazgos.
+
+**Qué quedó efectivamente comprobado:** apertura y lectura de las vistas `details` y `summary`. **Qué no se comprobó:** pulsar cada control, procesar/exportar el PDF, extraer los puntos internos de Highcharts, reproducir video y comprobar sincronía de fotogramas, ni analizar algoritmos privados. La auditoría documental queda cerrada con esos límites, que no deben presentarse como verificaciones efectuadas.
+
 ## 4. Diferencias entre esta web y los originales Xsens/Cometa
 
 | Criterio | Reporte Qualisys observado | Material Xsens/Cometa en KINORYX |
@@ -205,10 +223,9 @@ Estas ideas son **hipótesis de diseño**, no cambios aprobados para `main`.
 
 ## 6. Alcance real, límites y verificaciones faltantes
 
-**Se pudo inspeccionar directamente:** la vista renderizada **Test results** del enlace compartido, identidad presentada en pantalla, estructura de siete grupos, nombres y unidades de gráficas, texto de valores temporoespaciales, canales EMG, listas de ensayos, panel Video & 3D, opciones de exportación y versión del visor.
+**Se pudo inspeccionar directamente:** las vistas renderizadas **Test results** y **Findings**, incluida la sección vacía `Impairments`, además de la identidad presentada, estructura de siete grupos, nombres y unidades de gráficas, valores temporoespaciales legibles, canales EMG, lista de ensayos, panel Video & 3D, opciones de exportación y versión del visor.
 
 **No se pudo verificar de manera completa:**
-- El contenido específico de la pestaña **Findings**, aunque su enlace `/summary` está visible.
 - Puntos numéricos de todas las curvas Highcharts, sus intervalos, sus picos y su tabla subyacente.
 - Movimiento real de las animaciones o video y funcionamiento de cada control al hacer clic.
 - Generación efectiva del PDF, descarga de datos crudos o acceso a exportación C3D/otros.
@@ -216,12 +233,12 @@ Estas ideas son **hipótesis de diseño**, no cambios aprobados para `main`.
 - Identidad/procedencia del sujeto, consentimiento de publicación, ni relación con la sesión Xsens.
 - Cualquier interpretación clínica de las curvas.
 
-**El estudio de esta vista está completado dentro del acceso de lectura disponible**, pero **no es correcto decir que se auditó cada interacción o la pestaña Findings**. Para cerrar una auditoría funcional total se necesitaría una navegación interactiva autorizada, la vista `/summary` y, si existe, el PDF o exportaciones.
+**Cierre formal:** auditoría de contenido y estructura **cerrada**, tras inspeccionar ambas vistas. **Auditoría funcional exhaustiva no realizada**, porque esta conexión solo permitió leer el contenido renderizado y no ejecutar una batería controlada de clics, descargas o validación de las curvas. Ese alcance no impide cerrar este informe de referencia, pero sí impide afirmar que todos los componentes interactivos fueron probados.
 
 ## 7. Fuentes
 
 - Reporte concreto inspeccionado: https://report.qualisys.com/r/f8pMFlrTA/details
-- Enlace a Findings encontrado en la interfaz: https://report.qualisys.com/r/5fa134028746b70ebb5d8c7f/summary (contenido aún no inspeccionado)
+- Vista Findings inspeccionada directamente el 2026-10-31: https://report.qualisys.com/r/5fa134028746b70ebb5d8c7f/summary
 - Plataforma oficial y descripción de funciones: https://www.qualisys.com/analysis/online-reporting/
 - Módulo de Functional Assessment: https://www.qualisys.com/analysis/functional-assessment/
 - Curso oficial de reportes web: https://www.qualisys.com/video-tutorials/online-web-report-course/
