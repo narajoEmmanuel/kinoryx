@@ -208,7 +208,6 @@ def stage_navigation(active: str):
     return [
         dcc.Link(
             [
-                html.Span(f"{idx:02d}", className="lab-stage-index"),
                 html.Span(title, className="lab-stage-title"),
             ],
             href=f"/lab/{slug}",
@@ -485,8 +484,7 @@ def build_layout() -> html.Main:
         [
             dcc.Location(id="lab-location", refresh=False),
             dcc.Store(
-                id="lab-workspace",
-                storage_type="session",
+                id="lab-workspace", storage_type="session",
                 data={"left": ["0"], "right": ["2"]},
             ),
             html.Div(id="lab-workspace-hook", style={"display": "none"}),
@@ -494,40 +492,29 @@ def build_layout() -> html.Main:
                 [
                     html.Div(
                         [
-                            html.A("KINORYX", href="/", className="lab-brand"),
-                            html.Span("/", className="lab-breadcrumb-separator"),
-                            html.Span("Laboratory", className="lab-breadcrumb"),
-                        ], className="lab-header-brand",
+                            html.A("KINORYX", href="/", className="brand-kicker lab-brand"),
+                            html.H1("EMG Research Laboratory", className="page-title"),
+                        ],
+                        className="lab-header-brand",
                     ),
                     html.Nav(
                         [
                             html.A("Home", href="/"),
                             html.A("Dashboard", href="/dashboard/"),
-                        ], className="lab-top-links",
+                        ],
+                        className="lab-top-links",
                     ),
-                ], className="lab-product-header",
+                ],
+                className="lab-product-header hero-panel",
             ),
-            html.Div(
-                [
-                    html.H1("Laboratory", className="lab-page-title"),
-                    html.P(
-                        "A structured workflow for scientific signal research.",
-                        className="lab-page-description",
-                    ),
-                ], className="lab-page-heading",
+            html.Nav(
+                id="lab-stage-nav", className="lab-stage-nav",
+                **{"aria-label": "Laboratory research stages"},
             ),
-            html.Nav(id="lab-stage-nav", className="lab-stage-nav",
-                     **{"aria-label": "Laboratory research stages"}),
             html.Div(id="lab-stage-content"),
-            html.Footer(
-                "KINORYX Research Laboratory · Experimental branch · "
-                "Source recordings preserved",
-                className="lab-footer",
-            ),
         ],
         className="app-shell kinoryx-laboratory",
     )
-
 
 def mount_research_lab(flask_server) -> Dash:
     """Create one permanent /lab/ Dash application with four URL-based stages."""
@@ -609,11 +596,7 @@ def mount_research_lab(flask_server) -> Dash:
                 rec, current, mode=mode, start_seconds=float(start),
                 window_seconds=float(duration),
             )
-            status = (
-                f"{len(current['left']) + len(current['right'])} placements · "
-                f"{mode.replace('side', 'side by side').title()} · "
-                "Unprocessed channels, original scale"
-            )
+            status = "Raw data · Source scale"
             return chips("left"), chips("right"), figure, status
         except (TypeError, ValueError) as exc:
             return chips("left"), chips("right"), go.Figure(), (
