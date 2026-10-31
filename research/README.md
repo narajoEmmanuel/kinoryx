@@ -21,20 +21,30 @@ El reporte web de Qualisys está documentado en [research/qualisys](qualisys/REA
 
 ## Visualizar la investigación en el servidor local
 
-El laboratorio temporal se integró con el **dashboard existente de KINORYX** en el mismo servidor Dash. Permite visualizar las señales originales en tiempo real de interfaz, elegir canales e intervalos y comparar opcionalmente un filtro exploratorio o RMS. No se modifica la captura original.
+La entrada principal ya no contiene las gráficas. Los dos espacios comparten el mismo servidor local:
+
+| Página | Ruta | Función |
+| --- | --- | --- |
+| **Home** | http://127.0.0.1:8050/ | Inicio limpio con enlaces Laboratory y Dashboard |
+| **Dashboard** | http://127.0.0.1:8050/dashboard/ | La interfaz de marcha existente, conservada |
+| **Laboratory** | http://127.0.0.1:8050/lab/ | Cuatro subpáginas de investigación |
+
+En Laboratory: `/lab/exploration`, `/lab/quality`, `/lab/experimentation`, `/lab/evaluation`.
+
+La etapa Exploratory Analysis permite arrastrar canales a Panel A/B y elegir **Side by side**, **Stacked** o **Overlay**. La grabación original siempre queda intacta y la visualización exploratoria no realiza filtros. Las otras etapas disponen de sus propios espacios para registrar resultados conforme se investigue.
+
+Los archivos de progreso y evidencia se mantienen en `research/laboratory/01_exploratory_analysis.md`, `02_signal_quality.md`, `03_processing_experiments.md`, `04_evaluation_reporting.md`; los experimentos específicos continúan en `research/experiments/`.
+
+El servidor de desarrollo ya tiene hot reload. Para aplicar cambios ordinarios basta `git pull --ff-only` desde otra terminal sin detener el servidor. Solo si el proceso está detenido:
 
 ```powershell
 cd C:\dev\kinoryx-study
-git pull --ff-only
-.\.venv\Scripts\python.exe -m pip install -e ".[dashboard,dev]"
 .\.venv\Scripts\python.exe apps\biomechanics_dashboard\app.py
 ```
 
-- Dashboard de marcha: http://127.0.0.1:8050/
-- Vista EMG temporal: http://127.0.0.1:8050/lab/
-- [Manual del servidor, filtros opcionales y límites científicos](LIVE_DASHBOARD.md)
+[Manual detallado del servidor y de la nueva navegación](LIVE_DASHBOARD.md)
 
-**Primero estudiar las señales originales, después experimentar con los filtros.** La disponibilidad de filtros en el panel no significa que estén validados para este conjunto.
+**Primero estudiar señales originales, después evaluar calidad y experimentar con filtros.** La referencia Qualisys permanece separada de los archivos Cometa/Xsens.
 
 ## Ejecutar el primer estudio en Cursor
 
