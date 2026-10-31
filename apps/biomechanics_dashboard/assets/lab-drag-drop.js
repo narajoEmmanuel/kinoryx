@@ -22,7 +22,7 @@
   function commit(updated) {
     window.__kinoryxWorkspaceState = updated;
     if (window.dash_clientside && typeof window.dash_clientside.set_props === "function") {
-      window.dash_clientside.set_props("lab-workspace", {data: updated});
+      window.dash_clientside.set_props("lab-workspace-v2", {data: updated});
     }
   }
 
