@@ -19,6 +19,14 @@ Abre en el navegador:
 
 Hay un enlace a la vista de EMG en el encabezado del dashboard original, y un enlace de retorno dentro del laboratorio. Si el puerto 8050 ya está ocupado por un servidor anterior, detenlo con Ctrl+C en aquella terminal antes de iniciarlo.
 
+## Pulido visual aprobado para revisión, azul oficial y legibilidad
+
+**2026-10-31:** se mantiene el diseño y las familias tipográficas previas de KINORYX. La barra superior de Laboratory usa el azul oficial `--heading-blue: #0847A6` con textos blancos. Las cuatro etapas conservan su navegación y tienen curvas superiores más visibles, como pestañas de cuaderno. La etapa actual usa fondo azul y letras blancas, y las selecciones de controles del laboratorio siguen el mismo azul.
+
+La tipografía de toda la interfaz web no baja de **12 px** en los estilos propios del proyecto (base de 16 px y mínimo de 0.75 rem). Las figuras Plotly de Dashboard y Laboratory declaran tamaños de texto para ejes, anotaciones y tooltips de **10 px o superiores**. No se alteró ninguna familia tipográfica ni se crearon colores nuevos.
+
+En Home, Dashboard y Laboratory, el pie de página muestra únicamente **KINORYX**, centrado, separado por una línea discreta. El resto de controles y funciones de comparación continúa sin cambios. No modificar las medidas, las grabaciones o la rama `main`.
+
 ## Navegación compacta y vistas EMG (ajuste de interfaz)
 
 **2026-10-31, revisión del usuario:** la cabecera de Laboratory es una barra de trabajo baja, con KINORYX a la izquierda, el nombre de la subpágina centrado, y Home/Dashboard a la derecha. Las cuatro subpestañas permanecen centradas con un borde fino, esquinas superiores suavemente redondeadas y selección discreta, como hojas de un cuaderno. Se conservan exclusivamente las variables de fuentes y colores originales del proyecto.
