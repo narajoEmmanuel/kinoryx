@@ -462,3 +462,111 @@
     padding: 8px 10px;
   }
 }
+
+/* Approved laboratory refinements, original KINORYX official blue and fonts. */
+.app-shell.kinoryx-laboratory {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.kinoryx-laboratory #lab-stage-content {
+  flex: 1 0 auto;
+  min-width: 0;
+}
+.kinoryx-laboratory .lab-product-header {
+  background: var(--heading-blue);
+  color: #FFFFFF;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px clamp(16px, 2.3vw, 31px);
+  margin: 0 0 18px;
+  min-height: 62px;
+}
+.kinoryx-laboratory .lab-product-header .lab-brand,
+.kinoryx-laboratory .lab-product-header .lab-current-title,
+.kinoryx-laboratory .lab-product-header .lab-top-links a {
+  color: #FFFFFF;
+}
+.kinoryx-laboratory .lab-product-header .lab-top-links a {
+  font-size: .85rem;
+  font-weight: 600;
+}
+.kinoryx-laboratory .lab-product-header .lab-top-links a:hover,
+.kinoryx-laboratory .lab-product-header .lab-top-links a:focus-visible {
+  color: #FFFFFF;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.kinoryx-laboratory .lab-product-header .lab-current-title {
+  font-size: clamp(1rem, 1.45vw, 1.17rem);
+}
+/* Notebook-style curved section tabs, with a prominent official-blue active leaf. */
+.kinoryx-laboratory .lab-stage-nav {
+  gap: 8px;
+  padding: 5px 9px 0;
+  border-bottom: 1px solid var(--panel-border);
+  margin-bottom: 26px;
+}
+.kinoryx-laboratory .lab-stage-link {
+  min-height: 47px;
+  padding: 12px clamp(13px, 1.7vw, 23px);
+  border: 1px solid var(--panel-border);
+  border-bottom: 1px solid transparent;
+  border-radius: 19px 19px 0 0;
+  background: var(--panel-bg);
+  color: var(--muted);
+  font-size: .86rem;
+  font-weight: 500;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+.kinoryx-laboratory .lab-stage-link:hover {
+  background: var(--page-bg-deep);
+  color: var(--heading-blue);
+  border-color: var(--panel-border);
+}
+.kinoryx-laboratory .lab-stage-link.is-active,
+.kinoryx-laboratory .lab-stage-link.is-active:hover,
+.kinoryx-laboratory .lab-stage-link.is-active:focus-visible {
+  background: var(--heading-blue);
+  border-color: var(--heading-blue);
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: none;
+}
+.kinoryx-laboratory .lab-stage-link:focus-visible {
+  outline: 2px solid var(--heading-blue);
+  outline-offset: 3px;
+}
+.kinoryx-laboratory .lab-choice-list,
+.kinoryx-laboratory .lab-source,
+.kinoryx-laboratory .lab-source-name {
+  font-size: max(13px, .86rem);
+}
+.kinoryx-laboratory .lab-compact-metrics,
+.kinoryx-laboratory .lab-chip-name,
+.kinoryx-laboratory .lab-analysis-links,
+.kinoryx-laboratory .lab-status {
+  font-size: max(12px, .82rem);
+}
+.kinoryx-laboratory .lab-workspace-reset,
+.kinoryx-laboratory .lab-add-button,
+.kinoryx-laboratory .lab-mini-b,
+.kinoryx-laboratory .control-label {
+  font-size: max(12px, .78rem);
+}
+@media (max-width: 680px) {
+  .kinoryx-laboratory .lab-product-header {
+    padding: 11px 15px;
+    border-radius: 9px;
+  }
+  .kinoryx-laboratory .lab-stage-nav {
+    gap: 5px;
+    padding: 4px 2px 0;
+  }
+  .kinoryx-laboratory .lab-stage-link {
+    min-height: 43px;
+    padding: 9px 11px;
+    border-radius: 15px 15px 0 0;
+    font-size: max(12px, .77rem);
+  }
+}
