@@ -6,9 +6,11 @@
 
 [**Leer auditoría de estructura, contenido y funcionamiento, 2026-10-31**](REPORT_AUDIT_2026-10-31.md)
 
-La página de resultados se leyó directamente en el navegador conectado. El informe enumera las secciones concretas, etiquetas de variables, algunos valores visibles, navegación, selección de ensayos, visualizaciones, funciones documentadas por Qualisys y límites de inspección.
+**Estado: CERRADO el 2026-10-31**, como informe documental de la estructura y el contenido observable del reporte. Se leyeron directamente **Test results** y **Findings** en el navegador conectado. `Findings` muestra `Impairments` y el mensaje `There are no impairments to display yet.`, que no equivale a un diagnóstico negativo.
 
-El informe **no** dice haber inspeccionado gráficamente todos los puntos de las curvas ni la página **Findings**, que tiene enlace independiente. Tampoco se confirma el funcionamiento de los controles que no se pudieron manipular con la conexión de solo lectura.
+El informe enumera las siete secciones de resultados, etiquetas y unidades, valores legibles, navegación, ensayos, video/3D y exportación. Distingue lo observado de las funciones descritas por el fabricante y de las interacciones sin probar.
+
+El cierre **no** significa que se hayan descargado todos los puntos de las curvas, que se haya generado un PDF o que se haya comprobado la respuesta de cada control. Se declara expresamente el alcance de la inspección de solo lectura.
 
 - [Abrir enlace en el navegador](open_report.html)
 - [Documentación oficial de Qualisys Online Reporting](https://www.qualisys.com/analysis/online-reporting/)
