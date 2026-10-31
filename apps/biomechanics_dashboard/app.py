@@ -169,6 +169,7 @@ def build_figure(
         hovermode="closest",
         showlegend=False,
         font={"family": FIGURE_FONT, "size": 12, "color": TEXT_DARK},
+        hoverlabel={"font": {"family": FIGURE_FONT, "size": 12}},
     )
     figure.update_annotations(font={"family": FIGURE_FONT, "size": 13, "color": TEXT_DARK})
     figure.update_xaxes(
