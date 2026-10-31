@@ -1,6 +1,6 @@
 /* KINORYX laboratory research stages, clean white editorial interface.
    Scoped to the laboratory so the existing gait Dashboard is unaffected. */
-.kinoryx-laboratory {
+.app-shell.kinoryx-laboratory {
   width: min(100%, 1640px);
   max-width: 1640px;
   padding: 0 clamp(18px, 3.4vw, 58px) 55px;
@@ -152,4 +152,17 @@
   .lab-drop-grid,.lab-options-grid { grid-template-columns:1fr; }
   .lab-source-list { grid-template-columns:1fr; }
   .lab-breadcrumb { font-size:.95rem; }
+}
+
+/* Preserve the laboratory shell from the globally loaded dashboard CSS. */
+.app-shell.kinoryx-laboratory {
+  width: min(100%, 1640px);
+  max-width: 1640px;
+  margin: 0 auto;
+  padding: 0 clamp(18px, 3.4vw, 58px) 55px;
+}
+.lab-stage-record { margin: -17px 0 25px; font: .84rem Arial, sans-serif; }
+.lab-stage-record a { color: #235D86; }
+@media (max-width: 680px) {
+  .app-shell.kinoryx-laboratory { padding: 0 16px 35px; }
 }
