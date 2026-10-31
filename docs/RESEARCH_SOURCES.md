@@ -12,7 +12,11 @@ Status: **reference material plus a verified local EMG ingestion example, NOT sc
 
 Qualisys describes interactive reports with synchronized charts/video/3D visualizations, comparison tools and PDF export: https://www.qualisys.com/analysis/online-reporting/ . These are vendor capabilities, **not verified properties or results of the specific linked report**.
 
-## Locally inspected Xsens/Cometa example (originals private)
+## Approved foundational Xsens/Cometa reference (originals local-only)
+
+The supplying user explicitly approved these files as foundational research input for KINORYX on 2026-10-30. This approval allows the project to catalog the exact inputs, verify their integrity and develop scientific ingestion workflows. It does **not** by itself establish participant consent, ownership of third-party rights or permission to publish identifiable raw data.
+
+The original input set is now registered as a versioned [machine-readable session manifest](../examples/research/EMG2_Squats.manifest.json) with filenames, sizes, SHA-256 checksums and the still-unresolved session label. The source files themselves remain in locally controlled storage outside public git.
 
 The three user-provided files are a **single locally supplied example bundle**, not part of the public repository. Hashes below identify the exact inspected versions, without republishing signal values.
 
@@ -37,16 +41,17 @@ The nominal span between first and last samples is **8.263 seconds** per channel
 
 ## Supported local workflow
 
-Place the `.mvne` and other raw files in the git-ignored `data_local/` directory, with appropriate access controls. Then run:
+Place the three original files together in the git-ignored `data_local/` directory, with appropriate access controls. Verify the **complete approved source bundle**, then inspect/export the EMG:
 
 ```sh
+kinoryx verify-session data_local
 kinoryx inspect-emg data_local/EMG2_Squats-200714130240.mvne
 kinoryx export-emg data_local/EMG2_Squats-200714130240.mvne
 ```
 
 The second command creates `data_local/EMG2_Squats-200714130240_emg.csv` and an adjacent `.metadata.json` containing the SHA-256, channel mappings and preservation caveats. CSV columns are `time_s` (relative sample index / reported sampling rate) and `emg_ch0_raw` to `emg_ch3_raw`. Values are not scaled, filtered or normalized. This EMG contract is **separate** from the gyroscope demonstration CSV contract and is not accepted by the gait-event detector.
 
-The binary `.mvn` and `.mvns` are catalogued, **not decoded or synchronized**. The linked Qualisys report is a research reference, **not ingested or verified**. A future comparison requires independently verified provenance, axes/units, synchronized time bases, and scientifically defined reference outputs.
+The binary `.mvn` remains unparsed, while `.mvns` is checked for expected file references and all three files are verified byte-for-byte against the manifest; no motion data are decoded or synchronized. The linked Qualisys report is a research reference, **not ingested or verified**. A future comparison requires independently verified provenance, axes/units, synchronized time bases, and scientifically defined reference outputs.
 
 ## Reuse and privacy
 
