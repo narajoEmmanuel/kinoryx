@@ -16,11 +16,13 @@ from kinoryx.io.xsens_emg import EmgRecording
 from kinoryx.plot_layout import plan_subplot_layout
 
 
+# Reuse the existing dashboard palette instead of introducing new colors.
+# Each trace is still distinguishable when multiple channels are overlaid.
 CHANNEL_COLORS = {
-    "0": "#1C5D86",  # right rectus femoris
-    "1": "#C06C43",  # right biceps femoris
-    "2": "#6F4C91",  # left rectus femoris
-    "3": "#258477",  # left biceps femoris
+    "0": "#365d77",  # existing left-side blue
+    "1": "#a65d3f",  # existing right-side terracotta
+    "2": "#0847A6",  # existing dashboard heading blue
+    "3": "#657073",  # existing neutral accent
 }
 
 DEFAULT_WORKSPACE = {"left": ["0"], "right": ["2"]}
