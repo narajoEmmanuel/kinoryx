@@ -266,90 +266,29 @@ def workspace_slot(slot: str, label: str):
     )
 
 def exploration_content(rec: EmgRecording):
-    return html.Div(
+    """Preserve the previous signal-first page, adding compact movable panels."""
+    return html.Section(
         [
             html.Div(
                 [
-                    html.Div("CURRENT STAGE / 01", className="lab-kicker"),
-                    html.H2("Exploratory Analysis", className="lab-stage-heading"),
-                    html.P(
-                        "Inspect unprocessed EMG before performing any filtering or "
-                        "making physiological claims. Arrange signals for direct visual comparison.",
-                        className="lab-stage-description",
-                    ),
-                ],
-                className="lab-stage-intro",
-            ),
-            html.Div(
-                [
-                    html.A(
-                        "Experiment 01: First burst, 1.0 to 2.0 s",
-                        href=GITHUB_ROOT + "research/experiments/01_first_burst_raw.md",
-                        target="_blank", rel="noopener noreferrer",
-                    ),
-                    html.Span("Source evidence and descriptive measurements saved in GitHub"),
-                ],
-                className="lab-progress-strip",
-            ),
-            html.P(
-                html.A(
-                    "Review all Stage 01 notes and progress",
-                    href=GITHUB_ROOT + "research/laboratory/01_exploratory_analysis.md",
-                    target="_blank", rel="noopener noreferrer",
-                ),
-                className="lab-stage-record",
-            ),
-            html.Div(
-                [
-                    html.Aside(
+                    html.Div(
                         [
-                            html.H3("Signal library", className="lab-section-title"),
-                            html.P(
-                                "Drag a channel into Panel A or B. Use Add buttons "
-                                "for keyboard and touch-friendly placement.",
-                                className="lab-muted",
-                            ),
-                            html.Div(recording_palette(rec), className="lab-source-list"),
+                            html.H2("Recording", className="section-title"),
+                            html.P(SOURCE.name, className="lab-source"),
                             html.Div(
                                 [
-                                    html.Div("SOURCE RECORDING", className="lab-kicker"),
-                                    html.P(SOURCE.name, className="lab-filename"),
-                                    html.P(
-                                        f"{len(rec.channels)} channels · "
-                                        f"{rec.sampling_hz:g} Hz · "
-                                        f"{rec.sample_span_s:.3f} s",
-                                        className="lab-muted",
-                                    ),
-                                    html.P(
-                                        "Recorded amplitude units are not established. "
-                                        "No synchronization has been verified.",
-                                        className="lab-muted",
-                                    ),
+                                    html.Span(f"{len(rec.channels)} channels"),
+                                    html.Span(f"{rec.sampling_hz:g} Hz"),
+                                    html.Span(f"{rec.sample_span_s:.3f} s"),
                                 ],
-                                className="lab-recording-info",
+                                className="lab-compact-metrics",
                             ),
                         ],
-                        className="lab-sidebar",
+                        className="lab-recording-pane",
                     ),
-                    html.Section(
+                    html.Div(
                         [
-                            html.Div(
-                                [
-                                    html.H3("Signal workspace", className="lab-section-title"),
-                                    html.Button(
-                                        "Reset workspace",
-                                        className="lab-workspace-reset",
-                                        type="button",
-                                    ),
-                                ], className="lab-workspace-heading",
-                            ),
-                            html.Div(
-                                [
-                                    workspace_slot("left", "Panel A"),
-                                    workspace_slot("right", "Panel B"),
-                                ],
-                                className="lab-drop-grid",
-                            ),
+                            html.H2("View", className="section-title"),
                             html.Div(
                                 [
                                     html.Div(
@@ -371,7 +310,7 @@ def exploration_content(rec: EmgRecording):
                                     ),
                                     html.Div(
                                         [
-                                            html.Label("Window duration", className="control-label"),
+                                            html.Label("Window", className="control-label"),
                                             dcc.RadioItems(
                                                 id="lab-window",
                                                 options=[
@@ -392,40 +331,80 @@ def exploration_content(rec: EmgRecording):
                             ),
                             html.Div(
                                 [
-                                    html.Label("Window start (s)", className="control-label"),
+                                    html.Label("Start (s)", className="control-label"),
                                     dcc.Slider(
-                                        id="lab-start", min=0, max=8, step=0.1, value=1.0,
+                                        id="lab-start", min=0, max=8, step=0.1,
+                                        value=1.0,
                                         marks={0: "0", 2: "2", 4: "4", 6: "6", 8: "8"},
                                         tooltip={"placement": "bottom"},
                                     ),
                                 ],
                                 className="lab-time-control",
                             ),
-                            html.Div(id="lab-workspace-note", className="lab-status", role="status"),
-                            dcc.Loading(
-                                dcc.Graph(
-                                    id="lab-comparison-graph",
-                                    config=CONFIG,
-                                    className="lab-comparison-graph",
-                                ),
-                                type="circle",
-                            ),
-                            html.P(
-                                "Raw EMG only. Overlay uses the same original numeric scale; "
-                                "panel autoscaling and electrode conditions can affect visual comparisons. "
-                                "No force, normalized activation or validated event timing is inferred.",
-                                className="lab-muted",
-                            ),
                         ],
-                        className="lab-workspace-main",
+                        className="lab-controls-pane",
                     ),
                 ],
-                className="lab-exploration-grid",
+                className="lab-top-grid",
+            ),
+            html.Div(
+                [
+                    html.Div(
+                        [
+                            html.H2("Signals", className="section-title"),
+                            html.Button(
+                                "Reset", className="lab-workspace-reset", type="button",
+                            ),
+                        ],
+                        className="lab-workspace-heading",
+                    ),
+                    html.Div(
+                        recording_palette(rec),
+                        className="lab-source-list",
+                    ),
+                    html.Div(
+                        [
+                            workspace_slot("left", "A"),
+                            workspace_slot("right", "B"),
+                        ],
+                        className="lab-drop-grid",
+                    ),
+                ],
+                className="lab-signal-controls",
+            ),
+            html.Div(
+                [
+                    html.H2("Raw EMG", className="section-title"),
+                    html.Div(id="lab-workspace-note", className="lab-status", role="status"),
+                    dcc.Loading(
+                        dcc.Graph(
+                            id="lab-comparison-graph", config=CONFIG,
+                            className="lab-comparison-graph",
+                        ),
+                        type="circle",
+                    ),
+                    html.Div(
+                        [
+                            html.Span("Amplitude units unverified", className="lab-data-caution"),
+                            html.A(
+                                "Experiment notes",
+                                href=GITHUB_ROOT + "research/experiments/01_first_burst_raw.md",
+                                target="_blank", rel="noopener noreferrer",
+                            ),
+                            html.A(
+                                "Stage progress",
+                                href=GITHUB_ROOT + "research/laboratory/01_exploratory_analysis.md",
+                                target="_blank", rel="noopener noreferrer",
+                            ),
+                        ],
+                        className="lab-analysis-links",
+                    ),
+                ],
+                className="lab-figure-section",
             ),
         ],
-        className="lab-stage-body",
+        className="lab-stage-body lab-exploration-simple",
     )
-
 
 STAGE_CONTENT = {
     "quality": (
