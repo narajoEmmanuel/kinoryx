@@ -479,5 +479,21 @@ def create_app() -> Dash:
     return app
 
 
+def run_local_server() -> None:
+    """Run the study worktree with automatic code and browser hot reload.
+
+    On Python source updates, Werkzeug restarts its worker automatically.
+    Dash refreshes the open browser for UI and asset changes. This remains
+    bound to localhost only, never accessible from the network.
+    """
+    create_app().run(
+        host="127.0.0.1",
+        port=8050,
+        debug=True,
+        use_reloader=True,
+        dev_tools_hot_reload=True,
+    )
+
+
 if __name__ == "__main__":
-    create_app().run(host="127.0.0.1", port=8050, debug=False)
+    run_local_server()
