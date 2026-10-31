@@ -8,7 +8,7 @@ Fecha de apertura: 2026-10-30. Rama: `study/xsens-cometa-qualisys-20261030`.
 | 2 | `EMG2_Squats-200714130240.mvne` | 4 canales de Cometa, 2000 Hz, 16527 muestras/canal | Unidad, ganancia, filtrado, artefactos, electrodos, alineación temporal | Inspección ejecutada en Cursor, guía 02 disponible |
 | 3 | `EMG2_Squats.mvn` | Archivo binario original inspeccionado fuera de GitHub y registrado mediante SHA-256 | Formato decodificado, unidades, frames, segmentos, tiempo, ángulos | Binario incorporado a GitHub con tamaño y SHA-256 verificados; decodificación pendiente |
 | 4 | `EMG2_Squats_emg.csv` + `*.metadata.json` | Derivados locales del EMG original | Fidelidad, limitaciones de tiempo relativo y consistencia | Pendiente |
-| 5 | Reporte Qualisys | Vista de resultados inspeccionada y documentada, sin relación probada con Xsens | Página Findings, datos numéricos de curvas y controles interactivos no verificados | Auditoría separada completada dentro del acceso de lectura |
+| 5 | Reporte Qualisys | Test results y Findings inspeccionadas, sin relación probada con Xsens | Puntos internos de curvas, PDF y controles interactivos no verificados | Auditoría documental cerrada, 2026-10-31 |
 
 ## Registro de sesiones
 
@@ -38,6 +38,6 @@ Fecha de apertura: 2026-10-30. Rama: `study/xsens-cometa-qualisys-20261030`.
 
 **MVN:** incorporación completada el 2026-10-31 en `research/source_data/EMG2_Squats.mvn`. Verificación de Git blob `90760d5756b2e4c60f9426341ad43d57cd95863b`, tamaño 4,672,353 bytes, SHA-256 comprobado durante restauración en GitHub Actions. **Sin decodificar todavía.**
 
-**Qualisys:** inspección directa de la página `Test results` del reporte GaitCAST Full body (Visual3D). Informe detallado [REPORT_AUDIT_2026-10-31.md](qualisys/REPORT_AUDIT_2026-10-31.md). Se identifican siete grupos de análisis, tres ensayos visibles, EMG bilateral tibial anterior, panel video/3D, referencias y opciones de PDF. La página `Findings` y algunas interacciones requieren comprobación adicional. **No existe prueba de que Qualisys corresponda a la misma sesión Xsens/Cometa.**
+**Qualisys:** inspección directa de la página `Test results` del reporte GaitCAST Full body (Visual3D). Informe detallado [REPORT_AUDIT_2026-10-31.md](qualisys/REPORT_AUDIT_2026-10-31.md). Se identifican siete grupos de análisis, tres ensayos visibles, EMG bilateral tibial anterior, panel video/3D, referencias y opciones de PDF. La página `Findings` se inspeccionó posteriormente: encabezado `Impairments` y texto `There are no impairments to display yet.`. No equivale a demostrar ausencia de alteraciones. Las interacciones y los datos internos de curvas permanecen fuera del alcance verificado. **No existe prueba de que Qualisys corresponda a la misma sesión Xsens/Cometa.**
 
-**Decisión de orden:** no comenzar la siguiente lección sobre análisis fisiológico EMG hasta resolver el alcance restante del reporte web solicitado por el usuario.
+**Decisión de orden:** se completó el estudio documental de las dos vistas del reporte Qualisys y se cerró el informe independiente el 2026-10-31. No se inició la siguiente lección de señales durante este cierre; cualquier estudio EMG posterior debe mantenerse separado de Qualisys.
