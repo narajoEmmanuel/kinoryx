@@ -18,6 +18,7 @@ from dash import Dash, Input, Output, dcc, html
 
 from kinoryx.demo.synthetic import generate_demo_dataset
 from kinoryx.pipeline import ExploratoryResult, analyze_exploratory
+from kinoryx.plot_layout import plan_subplot_layout
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 MAX_UPLOAD_ROWS = 200_000
@@ -43,8 +44,6 @@ GRAPH_CONFIG = {
     "toImageButtonOptions": {
         "format": "svg",
         "filename": "kinoryx_figure",
-        "height": 900,
-        "width": 1500,
         "scale": 1,
     },
 }
@@ -98,12 +97,18 @@ def build_figure(
 
     cols = 2 if panel_layout == "grid" and len(panels) > 1 else 1
     rows = max(1, math.ceil(len(panels) / cols))
+    base_height = 405 if len(panels) < 3 else (750 if panel_layout == "grid" else 1040)
+    geometry = plan_subplot_layout(
+        [f"{SIDE_META[s]['label']} · {stage.title()}" for s, stage, _ in panels],
+        cols=cols,
+        minimum_height=base_height,
+    )
     figure = make_subplots(
         rows=rows,
         cols=cols,
         shared_xaxes="all",
-        subplot_titles=[f"{SIDE_META[s]['label']} · {stage.title()}" for s, stage, _ in panels],
-        vertical_spacing=0.14 if rows > 1 else 0.0,
+        subplot_titles=geometry.titles,
+        vertical_spacing=geometry.vertical_spacing,
         horizontal_spacing=0.11 if cols > 1 else 0.0,
     )
     time = result.raw["time_s"]
@@ -157,13 +162,13 @@ def build_figure(
         template=None,
         paper_bgcolor=FIGURE_BACKGROUND,
         plot_bgcolor=FIGURE_BACKGROUND,
-        height=405 if len(panels) < 3 else (750 if panel_layout == "grid" else 1040),
-        margin={"l": 78, "r": 25, "t": 68, "b": 64},
+        height=geometry.height,
+        margin={"l": 78, "r": 25, "t": 76 + 21 * (geometry.title_lines - 1), "b": 72},
         hovermode="closest",
         showlegend=False,
         font={"family": FIGURE_FONT, "size": 12, "color": TEXT_DARK},
     )
-    figure.update_annotations(font={"family": FIGURE_FONT, "size": 14, "color": TEXT_DARK})
+    figure.update_annotations(font={"family": FIGURE_FONT, "size": 13, "color": TEXT_DARK})
     figure.update_xaxes(
         showline=True, linewidth=1, linecolor=TEXT_DARK, ticks="outside",
         tickwidth=1, ticklen=4, tickcolor=TEXT_DARK,
@@ -271,7 +276,7 @@ def create_app() -> Dash:
                         className="page-subtitle",
                     ),
                     html.A(
-                        "Abrir laboratorio EMG experimental",
+                        "Open EMG research laboratory",
                         href="/lab/",
                         className="lab-nav-link",
                     ),
