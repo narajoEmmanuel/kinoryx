@@ -52,7 +52,7 @@ HOME_HTML = """<!DOCTYPE html>
     .entry-link:hover,.entry-link:focus-visible { background:#FFFFFF; border-color:var(--blue); outline-offset:3px; }
     .entry-desc { display:block; font-size:.76rem; font-weight:400;
                   letter-spacing:0; margin-top:8px; color:var(--muted); }
-    .foot { padding:50px 0 15px; text-align:center; color:var(--muted); font-size:.76rem; }
+    .foot { margin-top:clamp(45px, 13vh, 125px); padding:17px 0; text-align:center; border-top:1px solid var(--rule); color:var(--ink); font-family:var(--figure-font); font-weight:700; letter-spacing:.16em; font-size:.8rem; }
     @media (max-width: 560px) {
       .shell { padding:20px; } .brand { font-size:1.03rem; letter-spacing:.13em; }
       .intro { margin-top:68px; } .entry-link { padding:21px 16px; }
@@ -85,7 +85,7 @@ HOME_HTML = """<!DOCTYPE html>
         </a>
       </div>
     </main>
-    <footer class="foot">KINORYX | Research prototype</footer>
+    <footer class="foot">KINORYX</footer>
   </div>
 </body>
 </html>
