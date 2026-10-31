@@ -128,7 +128,7 @@
 .kinoryx-laboratory .lab-control-block { min-width: 0; }
 .kinoryx-laboratory .control-label {
   display: block;
-  font: 700 .74rem/1.4 var(--figure-font);
+  font: 700 .78rem/1.4 var(--figure-font);
   text-transform: uppercase;
   letter-spacing: .06em;
   color: var(--muted);
@@ -211,7 +211,7 @@
   padding: 4px 5px;
   background: transparent;
   color: var(--muted);
-  font: 700 .72rem var(--figure-font);
+  font: 700 .78rem var(--figure-font);
 }
 .kinoryx-laboratory .lab-add-button:hover,
 .kinoryx-laboratory .lab-add-button:focus-visible {
@@ -457,7 +457,7 @@
   .kinoryx-laboratory .lab-stage-nav { justify-content: center; gap: 3px; }
   .kinoryx-laboratory .lab-stage-link {
     flex: 0 1 auto;
-    font-size: .72rem;
+    font-size: .78rem;
     min-height: 33px;
     padding: 8px 10px;
   }
