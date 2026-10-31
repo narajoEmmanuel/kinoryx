@@ -4,9 +4,9 @@ Fecha de apertura: 2026-10-30. Rama: `study/xsens-cometa-qualisys-20261030`.
 
 | Orden | Archivo | Conocimiento confirmado en el archivo | Incógnita a resolver | Estado |
 | --- | --- | --- | --- | --- |
-| 1 | `EMG2_Squats.mvns` | XML v2, etiqueta `EMG2_Walkig`, dos referencias a MVN/MVNE, offsets declarados cero | Ejercicio real y sincronización instrumental no verificados | Guía de lectura disponible, pendiente trabajo en Cursor |
-| 2 | `EMG2_Squats-200714130240.mvne` | 4 canales de Cometa, 2000 Hz, 16527 muestras/canal | Unidad, ganancia, filtrado, artefactos, electrodos, alineación temporal | Pendiente |
-| 3 | `EMG2_Squats.mvn` | Archivo binario presente y registrado mediante SHA-256 | Formato decodificado, unidades, frames, segmentos, tiempo, ángulos | Pendiente |
+| 1 | `EMG2_Squats.mvns` | XML v2, etiqueta `EMG2_Walkig`, dos referencias a MVN/MVNE, offsets declarados cero | Ejercicio real y sincronización instrumental no verificados | Original en GitHub, guía disponible |
+| 2 | `EMG2_Squats-200714130240.mvne` | 4 canales de Cometa, 2000 Hz, 16527 muestras/canal | Unidad, ganancia, filtrado, artefactos, electrodos, alineación temporal | Original en GitHub, análisis descriptivo disponible |
+| 3 | `EMG2_Squats.mvn` | Archivo binario original inspeccionado fuera de GitHub y registrado mediante SHA-256 | Formato decodificado, unidades, frames, segmentos, tiempo, ángulos | Binario aún no transferido a GitHub |
 | 4 | `EMG2_Squats_emg.csv` + `*.metadata.json` | Derivados locales del EMG original | Fidelidad, limitaciones de tiempo relativo y consistencia | Pendiente |
 | 5 | Reporte Qualisys | URL documentada | Contenido verificable, permisos, relación con la sesión | Pendiente |
 
