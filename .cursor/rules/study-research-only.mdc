@@ -1,0 +1,12 @@
+---
+description: KINORYX non-mergeable exploratory lab for Xsens/Cometa and Qualisys study
+globs: research/**,tests/test_research_study.py
+alwaysApply: false
+---
+
+This branch is disposable, research-only and must never be merged into main.
+- Treat original MVN, MVNS, MVNE, Qualisys exports, participant information and derived plots as private local data under git-ignored data_local/.
+- Work in research/ and its branch-specific synthetic test file; avoid editing the production app or engine unless the user explicitly changes this rule.
+- Separate observations from hypotheses and validated scientific facts. Do not infer motion frames from binary bytes, calibrated EMG units, exact exercise type, synchronization, muscle force or diagnosis.
+- Log findings in research/STUDY_LOG.md and product decisions in research/DECISION_LOG.md.
+- Do not open a pull request targeting main, merge, cherry-pick or deploy this study branch. Future production features require independent development from a fresh main-based branch.
