@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   restore:
-    if: github.event.head_commit.message == 'research(data): stage verified MVN transfer chunks'
+    if: github.event.head_commit.message == 'stage-MVN'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +43,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f research/source_data/EMG2_Squats.mvn
           git rm -r research/source_data/mvn_transfer
-          git rm .github/workflows/restore-mvn-study.yml
           git commit -m "research(data): restore original Xsens MVN binary with SHA-256 verification"
           git push origin HEAD:study/xsens-cometa-qualisys-20261030
