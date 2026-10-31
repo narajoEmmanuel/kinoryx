@@ -78,5 +78,10 @@ def test_dashboard_serves_lab_on_same_localhost_server():
     spec.loader.exec_module(module)
     dashboard = module.create_app()
     client = dashboard.server.test_client()
-    assert client.get("/").status_code == 200
-    assert client.get("/lab/").status_code == 200
+    main_response = client.get("/")
+    lab_response = client.get("/lab/")
+    assert main_response.status_code == 200
+    assert lab_response.status_code == 200
+    assert b"Biomechanics Dashboard" in main_response.data
+    assert b"Laboratorio EMG" in lab_response.data
+    assert b"Biomechanics Dashboard" not in lab_response.data
