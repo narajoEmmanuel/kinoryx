@@ -39,7 +39,7 @@ Verifica los tres archivos originales, ya presentes en GitHub:
 
 ## Estado del estudio: pausa antes de interpretar señales
 
-El usuario ha pedido completar primero el archivo MVN y un informe independiente del reporte web. El MVN ya está incorporado, y la inspección específica de Qualisys quedó documentada en [REPORT_AUDIT_2026-10-31.md](qualisys/REPORT_AUDIT_2026-10-31.md). Las páginas o interacciones no accesibles se identifican en ese documento.
+**Auditoría documental Qualisys cerrada el 2026-10-31.** El archivo MVN ya está incorporado y verificado. Las vistas `Test results` y `Findings` se inspeccionaron directamente, y el informe independiente [REPORT_AUDIT_2026-10-31.md](qualisys/REPORT_AUDIT_2026-10-31.md) explica el contenido observado. `Findings` muestra `Impairments` sin entradas visibles; no implica un resultado clínico normal. La lectura de gráficos internos, exportaciones y pruebas detalladas de controles no se completó y está identificada como limitación, sin bloquear el cierre documental.
 
 La lección EMG siguiente está preparada pero no se debe ejecutar como siguiente etapa hasta cerrar el alcance pendiente de la auditoría web.
 
