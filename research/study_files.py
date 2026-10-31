@@ -147,19 +147,29 @@ def plot_emg(chart_data: dict, sampling_hz: float, output_dir: Path) -> list[str
 
 def study(data_dir: Path, output_dir: Path, session_file: str, plots: bool) -> dict:
     session = read_session(data_dir / session_file)
-    if any(not entry["exists"] for entry in session["references"]):
-        raise FileNotFoundError("A recording referenced by the MVNS index is missing")
     mvn = [entry["filename"] for entry in session["references"]
            if entry["filename"].lower().endswith(".mvn")]
     mvne = [entry["filename"] for entry in session["references"]
             if entry["filename"].lower().endswith(".mvne")]
     if len(mvn) != 1 or len(mvne) != 1:
         raise ValueError("Expected exactly one MVN and MVNE source")
-    emg_summary, chart_data = read_emg(data_dir / mvne[0])
+    emg_path = data_dir / mvne[0]
+    if not emg_path.is_file():
+        raise FileNotFoundError(f"Missing EMG file: {emg_path}")
+    emg_summary, chart_data = read_emg(emg_path)
     output_dir.mkdir(parents=True, exist_ok=True)
     summary = {
         "session_index": session,
-        "motion_binary": read_motion_fingerprint(data_dir / mvn[0]),
+        "motion_binary": (
+            read_motion_fingerprint(data_dir / mvn[0])
+            if (data_dir / mvn[0]).is_file()
+            else {
+                "filename": mvn[0],
+                "available": False,
+                "decoded": False,
+                "caution": "Binary MVN not present in GitHub; only its manifest hash is recorded",
+            }
+        ),
         "emg": emg_summary,
         "derived": derived_files(data_dir),
         "qualisys_reference": "https://report.qualisys.com/r/f8pMFlrTA/details",
@@ -176,7 +186,7 @@ def study(data_dir: Path, output_dir: Path, session_file: str, plots: bool) -> d
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="KINORYX study-only file inspection")
-    parser.add_argument("--data-dir", type=Path, default=Path("data_local"))
+    parser.add_argument("--data-dir", type=Path, default=Path("research/source_data"))
     parser.add_argument("--output-dir", type=Path, default=Path("data_local/study_output"))
     parser.add_argument("--session", default="EMG2_Squats.mvns")
     parser.add_argument("--plots", action="store_true")
