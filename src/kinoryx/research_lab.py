@@ -532,7 +532,7 @@ def build_layout() -> html.Main:
                 ], className="lab-page-heading",
             ),
             html.Nav(id="lab-stage-nav", className="lab-stage-nav",
-                     aria_label="Laboratory research stages"),
+                     **{"aria-label": "Laboratory research stages"}),
             html.Div(id="lab-stage-content"),
             html.Footer(
                 "KINORYX Research Laboratory · Experimental branch · "
@@ -547,7 +547,7 @@ def build_layout() -> html.Main:
 def mount_research_lab(flask_server) -> Dash:
     """Create one permanent /lab/ Dash application with four URL-based stages."""
     from kinoryx.lab_workspace import (
-        DEFAULT_WORKSPACE, CHANNEL_COLORS, academic_channel_name,
+        CHANNEL_COLORS, academic_channel_name,
         build_workspace_figure, canonical_workspace,
     )
 
