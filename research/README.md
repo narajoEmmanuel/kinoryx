@@ -19,6 +19,23 @@ El reporte web de Qualisys está documentado en [research/qualisys](qualisys/REA
 
 **Atención:** el repositorio de Kinoryx es público; los tres originales que se subieron a esta rama pueden verse públicamente. Los datos EMG no adquieren licencia MIT por estar presentes en el repositorio.
 
+## Visualizar la investigación en el servidor local
+
+El laboratorio temporal se integró con el **dashboard existente de KINORYX** en el mismo servidor Dash. Permite visualizar las señales originales en tiempo real de interfaz, elegir canales e intervalos y comparar opcionalmente un filtro exploratorio o RMS. No se modifica la captura original.
+
+```powershell
+cd C:\dev\kinoryx-study
+git pull --ff-only
+.\.venv\Scripts\python.exe -m pip install -e ".[dashboard,dev]"
+.\.venv\Scripts\python.exe apps\biomechanics_dashboard\app.py
+```
+
+- Dashboard de marcha: http://127.0.0.1:8050/
+- Vista EMG temporal: http://127.0.0.1:8050/lab/
+- [Manual del servidor, filtros opcionales y límites científicos](LIVE_DASHBOARD.md)
+
+**Primero estudiar las señales originales, después experimentar con los filtros.** La disponibilidad de filtros en el panel no significa que estén validados para este conjunto.
+
 ## Ejecutar el primer estudio en Cursor
 
 En la terminal de `C:\dev\kinoryx-study`:
@@ -41,11 +58,11 @@ Verifica los tres archivos originales, ya presentes en GitHub:
 
 **Auditoría documental Qualisys cerrada el 2026-10-31.** El archivo MVN ya está incorporado y verificado. Las vistas `Test results` y `Findings` se inspeccionaron directamente, y el informe independiente [REPORT_AUDIT_2026-10-31.md](qualisys/REPORT_AUDIT_2026-10-31.md) explica el contenido observado. `Findings` muestra `Impairments` sin entradas visibles; no implica un resultado clínico normal. La lectura de gráficos internos, exportaciones y pruebas detalladas de controles no se completó y está identificada como limitación, sin bloquear el cierre documental.
 
-La lección EMG siguiente está preparada pero no se debe ejecutar como siguiente etapa hasta cerrar el alcance pendiente de la auditoría web.
+La auditoría documental web ya se cerró. Se puede comenzar el estudio gradual de EMG, iniciando por la señal original en el servidor local antes de probar transformaciones.
 
 ## Siguiente ejercicio: estudiar la EMG por intervalos
 
-La lección 01 ya se ejecutó correctamente en Cursor el 2026-10-31. La captura MVN sigue ausente, pero eso no impide estudiar las cuatro señales EMG disponibles en GitHub.
+La lección 01 ya se ejecutó correctamente en Cursor el 2026-10-31. La captura MVN ya está presente y su integridad se verificó, pero aún no se decodificó; esto no impide estudiar las cuatro señales EMG disponibles en GitHub.
 
 ```powershell
 .\.venv\Scripts\python.exe research\lessons\02_emg.py
