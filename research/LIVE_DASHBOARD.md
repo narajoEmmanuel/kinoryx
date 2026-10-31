@@ -19,6 +19,39 @@ Abre en el navegador:
 
 Hay un enlace a la vista de EMG en el encabezado del dashboard original, y un enlace de retorno dentro del laboratorio. Si el puerto 8050 ya está ocupado por un servidor anterior, detenlo con Ctrl+C en aquella terminal antes de iniciarlo.
 
+## Navegación del sistema, primer ajuste de arquitectura
+
+A partir de esta revisión, KINORYX utiliza tres rutas en el servidor local:
+
+| Página | Dirección | Contenido |
+| --- | --- | --- |
+| Home | http://127.0.0.1:8050/ | Portada mínima con accesos Laboratory y Dashboard |
+| Dashboard | http://127.0.0.1:8050/dashboard/ | El dashboard de marcha anterior, sin eliminar sus controles ni sus análisis |
+| Laboratory | http://127.0.0.1:8050/lab/ | Laboratorio con cuatro etapas navegables y espacio flexible de señales |
+
+**Subpáginas reales del laboratorio:**
+- `/lab/exploration`: `Exploratory Analysis`, señales crudas, biblioteca de canales, gráficos movibles y enlace al primer experimento documentado.
+- `/lab/quality`: `Signal Quality Assessment`, lista metodológica y estado aún no evaluado.
+- `/lab/experimentation`: `Signal Processing Experiments`, plan de comparación y parámetros pendientes de validar.
+- `/lab/evaluation`: `Evaluation & Reporting`, criterios de decisión y enlace a la bitácora.
+
+En esta iteración, solo la etapa exploratoria incluye gráficos de investigación. Las demás pantallas **no afirman análisis realizados** y servirán para colocar resultados posteriores. El informe Qualisys es una referencia documental independiente y no se confunde con los registros originales.
+
+### Montar y organizar canales en Exploratory Analysis
+
+Los canales originales son elementos arrastrables de `Signal library`; también se pueden agregar sin arrastrar usando `Add to A` y `Add to B` (accesible en equipos táctiles). Arrastrar un canal sobre `Panel A` o `Panel B` lo añade a esa zona. Un canal colocado se puede arrastrar al panel opuesto, y la `×` lo quita del panel sin afectar el archivo de origen. `Reset workspace` restaura la comparación inicial entre recto femoral derecho e izquierdo.
+
+El selector `Arrangement` admite:
+- `Side by side`, dos gráficos adyacentes con sus propias series.
+- `Stacked`, dos gráficos uno encima del otro.
+- `Overlay`, todas las series seleccionadas superpuestas en un gráfico, cada canal con su color fijo.
+
+No se realizan transformaciones en la etapa exploratoria. Los valores reflejan las **muestras originales**, y la escala desconocida del instrumento se declara claramente. El selector de ventana permite estudiar un intervalo local de la señal. Los paneles y arreglos están guardados por pestaña/sesión en `dcc.Store`; actualizar o cambiar de etapa conserva los canales elegidos mientras dure la sesión del navegador.
+
+**Compatibilidad:** se utiliza drag and drop HTML5 y `dash_clientside.set_props` disponible en Dash 2.16+. El proyecto declara Dash 2.17 o superior. Si el navegador no admite arrastre, los botones `Add to A/B` siguen disponibles.
+
+**Comportamiento de trabajo:** el servidor local conserva el mecanismo de recarga automática ya configurado; evita solicitar reinicios manuales repetidos. Las rutas anteriores y la estructura nueva siguen aisladas en la rama experimental; `main` permanece intacta.
+
 ## Display language and adaptive chart layout
 
 **Interface language:** academic English throughout the existing gait dashboard and the temporary EMG laboratory. This includes navigation, controls, figure headings, axis captions, hover details and status messages. Muscle labels use conventional `Right/Left rectus femoris` and `Right/Left biceps femoris` wording for display only; the original labels and source bytes remain untouched.
