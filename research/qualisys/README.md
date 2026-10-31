@@ -1,10 +1,17 @@
-# Qualisys report, original source link
+# Qualisys, auditoría independiente de la web
 
-**Web URL provided by the user:** https://report.qualisys.com/r/f8pMFlrTA/details
+**Reporte estudiado:** https://report.qualisys.com/r/f8pMFlrTA/details
 
-- This is a live external Qualisys report, not an offline archive. The interactive report content could not be retrieved from this environment, so it has **not** been copied, captured, or falsely represented as a complete offline website.
-- The link is preserved here and in [the local HTML launcher](open_report.html). The report remains hosted by Qualisys and may require a browser session or permissions to view.
-- Do not assume this report is from the same recording as `EMG2_Squats`. The relationship must be verified from source evidence.
-- If an authorized static PDF/HTML export becomes available, it can be studied separately without inventing data. Keep any subject identifiers protected.
+## Informe separado
 
-For reference, Qualisys documents a PDF export workflow at https://docs.qualisys.com/functional-assessment/Content/Generic/Capture%20Step%2009%20-%20Report.htm .
+[**Leer auditoría de estructura, contenido y funcionamiento, 2026-10-31**](REPORT_AUDIT_2026-10-31.md)
+
+La página de resultados se leyó directamente en el navegador conectado. El informe enumera las secciones concretas, etiquetas de variables, algunos valores visibles, navegación, selección de ensayos, visualizaciones, funciones documentadas por Qualisys y límites de inspección.
+
+El informe **no** dice haber inspeccionado gráficamente todos los puntos de las curvas ni la página **Findings**, que tiene enlace independiente. Tampoco se confirma el funcionamiento de los controles que no se pudieron manipular con la conexión de solo lectura.
+
+- [Abrir enlace en el navegador](open_report.html)
+- [Documentación oficial de Qualisys Online Reporting](https://www.qualisys.com/analysis/online-reporting/)
+- [Curso oficial de reportes web](https://www.qualisys.com/video-tutorials/online-web-report-course/)
+
+**No existe prueba de que el ejemplo GaitCAST sea la misma adquisición, sujeto o actividad que los archivos Xsens/Cometa.** Este reporte se documenta por separado como referencia de investigación y diseño de producto.
