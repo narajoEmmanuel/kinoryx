@@ -5,7 +5,8 @@ alwaysApply: false
 ---
 
 This branch is disposable, research-only and must never be merged into main.
-- Treat original MVN, MVNS, MVNE, Qualisys exports, participant information and derived plots as private local data under git-ignored data_local/.
+- The original MVNS and MVNE are deliberately tracked in research/source_data/ by explicit user instruction. This repository is public. Do not post participant identifiers or additional recordings without a separate review. The original binary MVN is not yet tracked.
+- Keep generated plots, derived CSVs, any identifying exports and analysis results in git-ignored data_local/ unless explicitly approved for publication.
 - Work in research/ and its branch-specific synthetic test file; avoid editing the production app or engine unless the user explicitly changes this rule.
 - Separate observations from hypotheses and validated scientific facts. Do not infer motion frames from binary bytes, calibrated EMG units, exact exercise type, synchronization, muscle force or diagnosis.
 - Log findings in research/STUDY_LOG.md and product decisions in research/DECISION_LOG.md.
