@@ -50,3 +50,12 @@ Fecha de apertura: 2026-10-30. Rama: `study/xsens-cometa-qualisys-20261030`.
 **Notas visuales preliminares, no cuantificadas:** en ambos canales *rectus femoris* parecen existir ráfagas de amplitud más alta aproximadamente entre 1.2 y 1.8 s, 3.5 y 4.2 s, y 6.0 y 6.6 s. Los canales *biceps femoris* muestran un patrón distinto, con picos aislados que todavía no se han clasificado. No se ha demostrado todavía si esos segmentos representan actividad fisiológica, artefactos o su coincidencia temporal con eventos cinemáticos. **No** inferir simetría, fuerza, activación normalizada ni tipo de ejercicio a partir de capturas.
 
 **Decisión:** no modificar los originales ni avanzar aún a comparaciones filtradas; primero comprobar legibilidad y reproducibilidad de las gráficas originales con los nuevos títulos.
+
+
+### Etapa 01, Experiment 01: First EMG Burst (1.0 to 2.0 s)
+
+**Status:** source-level descriptive analysis completed, visual walkthrough pending user inspection. Detailed reproducible results and limits: [01_first_burst_raw.md](experiments/01_first_burst_raw.md).
+
+The 2000 unprocessed samples per channel show maximum absolute sample times at 1.3890 s (right rectus femoris), 1.5120 s (left rectus femoris), 1.9755 s (right biceps femoris), and 1.8540 s (left biceps femoris). These values are neither EMG activation onset times nor proof of muscle coordination. All amplitudes remain in unknown original units. No filters or signal transformations were applied.
+
+**Next:** inspect the plotted raw waveforms between 1.0 and 2.0 s on the local server, decide whether excursions are sustained or isolated, then move to another window before signal-quality assessment.
