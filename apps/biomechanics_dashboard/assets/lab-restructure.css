@@ -570,3 +570,15 @@
     font-size: max(12px, .77rem);
   }
 }
+
+/* Active laboratory controls follow the same approved blue as the current tab. */
+.kinoryx-laboratory .lab-choice-list input,
+.kinoryx-laboratory .lab-time-control .rc-slider-track {
+  accent-color: var(--heading-blue);
+}
+.kinoryx-laboratory .lab-time-control .rc-slider-track {
+  background: var(--heading-blue);
+}
+.kinoryx-laboratory .lab-time-control .rc-slider-handle {
+  border-color: var(--heading-blue);
+}
